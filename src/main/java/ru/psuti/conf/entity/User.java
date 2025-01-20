@@ -22,6 +22,9 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private Boolean emailVerified;
+
     @Enumerated(EnumType.ORDINAL)
     private Role role;
 
@@ -30,10 +33,10 @@ public class User implements UserDetails {
 
     private String password;
 
-    @Column(name = "first_name_ru", length = 50, nullable = false)
+    @Column(name = "firstname_ru", length = 50, nullable = false)
     private String firstnameRu;
 
-    @Column(name = "first_name_en", length = 50)
+    @Column(name = "firstname_en", length = 50)
     private String firstnameEn;
 
     @Column(name = "surname_ru", length = 100, nullable = false)
@@ -48,10 +51,10 @@ public class User implements UserDetails {
     @Column(name = "lastname_en", length = 50)
     private String lastnameEn;
 
-    @Column(name = "country", length = 32, nullable = false)
+    @Column(name = "country", length = 50, nullable = false)
     private String country;
 
-    @Column(name = "city", length = 32, nullable = false)
+    @Column(name = "city", length = 50, nullable = false)
     private String city;
 
     @Column(name = "organization")
@@ -68,5 +71,10 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return getEmailVerified();
     }
 }
