@@ -1,0 +1,70 @@
+package ru.psuti.conf.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity(name = "conferences")
+public class Conference {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String slug;
+
+    @Column(name = "is_english_enable", nullable = false)
+    private Boolean isEnglishEnable;
+
+    @Column(name = "conference_name_ru", nullable = false)
+    private String conferenceNameRu;
+
+    @Column(name = "conference_name_en")
+    private String conferenceNameEn;
+
+    @Column(name = "status_ru")
+    private String statusRu;
+
+    @Column(name = "status_en")
+    private String statusEn;
+
+    @Column(name = "description_ru")
+    private String descriptionRu;
+
+    @Column(name = "description_en")
+    private String descriptionEn;
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
+    @Column(name = "closing_date_for_applications")
+    private LocalDate closingDateForApplications;
+
+    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
+    private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>();
+
+    @ManyToMany(cascade = { CascadeType.MERGE })
+    @JoinTable(
+            name = "conferences_organizers",
+            joinColumns = @JoinColumn(name = "conference_id"),
+            inverseJoinColumns = @JoinColumn(name = "organizer_id")
+    )
+    private List<ConferenceOrganizer> conferenceOrganizers = new ArrayList<ConferenceOrganizer>();
+
+
+}
