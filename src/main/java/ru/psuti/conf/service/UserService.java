@@ -7,7 +7,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.psuti.conf.entity.Role;
 import ru.psuti.conf.entity.User;
+import ru.psuti.conf.repository.EmailChangeCodeRepository;
 import ru.psuti.conf.repository.UserRepository;
 
 import java.util.Optional;
@@ -15,7 +18,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository repository;
+    private final UserRepository userRepository;
+
+    private final EmailChangeCodeRepository emailChangeCodeRepository;
 
     public static Optional<User> getCurrentUser() {
         // Получение имени пользователя из контекста Spring Security
@@ -27,19 +32,27 @@ public class UserService {
     }
 
     public User save(User user) {
-        return repository.save(user);
+        if (user.getRole() == null)
+            user.setRole(Role.USER);
+        if (user.getEmailVerified() == null)
+            user.setEmailVerified(false);
+
+        return userRepository.save(user);
     }
 
-    public User create(User user) {
-        if (repository.existsByEmail(user.getUsername())) {
-            return null;
-        }
+    @Transactional
+    public Optional<User> createByEmail(User user) {
+        if (userRepository.existsByEmail(user.getUsername()))
+            return Optional.empty();
 
-        return save(user);
+        if (emailChangeCodeRepository.existsByNewEmail(user.getUsername()))
+            return Optional.empty();
+
+        return Optional.ofNullable(save(user));
     }
 
     public User getByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByEmail(username)
+        return userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     }
 
@@ -48,11 +61,11 @@ public class UserService {
     }
 
     public void deleteUserById(Long id) {
-        repository.deleteById(id);
+        userRepository.deleteById(id);
     }
 
     public boolean existsUserById(Long id) {
-        return repository.existsById(id);
+        return userRepository.existsById(id);
     }
 
 }

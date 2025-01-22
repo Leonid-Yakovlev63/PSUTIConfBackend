@@ -20,7 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
+import ru.psuti.conf.entity.Role;
 import ru.psuti.conf.service.UserService;
 
 import java.util.List;
@@ -49,38 +51,56 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, Environment env) throws Exception {
         log.debug("Запускается конфигурация spring security.");
         boolean isDevProfile = env.acceptsProfiles(Profiles.of("dev"));
-        http.cors(cors -> cors.configurationSource(request -> {
-            var corsConfiguration = new CorsConfiguration();
-
-            if (isDevProfile) {
-                log.warn("Используется профиль для разработки: cors выключен.");
+        if (isDevProfile) {
+            log.warn("Используется профиль для разработки: cors выключен.");
+            http.cors(cors -> cors.configurationSource(request -> {
+                log.warn("Запрос выполнен с выключеной защитой cors, так как запущен режим разработки.");
+                var corsConfiguration = new CorsConfiguration();
                 corsConfiguration.setAllowedOriginPatterns(List.of("*"));
-            } else {
-                corsConfiguration.setAllowedOriginPatterns(allowedOrigins);
-            }
-            corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-            corsConfiguration.setAllowedHeaders(List.of("*"));
-            corsConfiguration.setAllowCredentials(true);
-            corsConfiguration.setMaxAge(3600L);
+                corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfiguration.setAllowedHeaders(List.of("*"));
+                corsConfiguration.setAllowCredentials(true);
+                corsConfiguration.setMaxAge(3600L);
 
-            return corsConfiguration;
-        }));
+                return corsConfiguration;
+            }));
+        } else {
+            http.cors(cors -> cors.configurationSource(request -> {
+                var corsConfiguration = new CorsConfiguration();
+                corsConfiguration.setAllowedOriginPatterns(allowedOrigins);
+                corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfiguration.setAllowedHeaders(List.of("*"));
+                corsConfiguration.setAllowCredentials(true);
+                corsConfiguration.setMaxAge(3600L);
+
+                return corsConfiguration;
+            }));
+        }
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .logout(AbstractHttpConfigurer::disable)
-            .rememberMe(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(request -> {
-                request
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .anyRequest().permitAll();
-            })
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(e -> e.accessDeniedHandler(customAccessDeniedHandler)
-                    .authenticationEntryPoint(customAuthenticationEntryPoint));
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .rememberMe(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers
+                        .xssProtection(
+                                xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
+                        ).contentSecurityPolicy(
+                                cps -> cps.policyDirectives("script-src 'self'")
+                        )
+                )
+                .authorizeHttpRequests(request -> {
+                    request
+                            .requestMatchers(AUTH_WHITELIST).permitAll()
+                            .requestMatchers("/users/me").authenticated()
+                            .requestMatchers("/users/**").hasRole(Role.ADMIN.name())
+                            .anyRequest().permitAll();
+                })
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(e -> e.accessDeniedHandler(customAccessDeniedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
         log.debug("Завершено конфигурирование spring security");
         return http.build();
     }

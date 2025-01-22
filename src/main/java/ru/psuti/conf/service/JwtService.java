@@ -5,12 +5,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.psuti.conf.entity.User;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,12 +34,19 @@ public class JwtService {
             claims.put("id", customUserDetails.getId());
             claims.put("role", customUserDetails.getRole());
         }
-        return generateToken(claims, userDetails, 2L * 60 * 60 * 1000);
+
+        long issuedAt = System.currentTimeMillis();
+
+        return generateToken(claims, userDetails, new Date(issuedAt), new Date(issuedAt + 2L * 60 * 60 * 1000));
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
+    public Pair<String, Date> generateRefreshToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return generateToken(claims, userDetails, 30L * 24 * 60 * 60 * 1000);
+
+        long issuedAt = System.currentTimeMillis();
+        Date expiration = new Date(issuedAt + 2L * 60 * 60 * 1000);
+
+        return Pair.of(generateToken(claims, userDetails, new Date(issuedAt), expiration), expiration);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -50,11 +59,11 @@ public class JwtService {
         return claimsResolvers.apply(claims);
     }
 
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationTime) {
+    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, Date issuedAt, Date expiration) {
         return Jwts.builder()
                 .claims(extraClaims).subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .issuedAt(issuedAt)
+                .expiration(expiration)
                 .signWith(getSigningKey()).compact();
     }
 

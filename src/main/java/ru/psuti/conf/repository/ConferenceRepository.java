@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.psuti.conf.entity.Conference;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +17,10 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
     List<Conference> findConferencesByYear(@Param("year") Short year);
 
     Optional<Conference> findConferenceBySlug(String slug);
+
+    List<Conference> findByEndDateGreaterThanEqual(LocalDate now);
+
+    @Query(value = "SELECT DISTINCT EXTRACT(YEAR FROM c.end_date) AS year FROM conferences AS c ORDER BY year ASC", nativeQuery = true)
+    List<Short> findYears();
 
 }
