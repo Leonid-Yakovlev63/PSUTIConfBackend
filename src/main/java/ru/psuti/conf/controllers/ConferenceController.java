@@ -52,8 +52,17 @@ public class ConferenceController {
 
     }
 
+    @GetMapping("/years")
+    public List<Short> getYears() {
+        return conferenceService.getYears();
+    }
 
-    @GetMapping("/year/{year}")
+    @GetMapping("/years/current")
+    public List<CompactConference> getCurrentConferences() {
+        return conferenceService.getCurrentConferences();
+    }
+
+    @GetMapping("/years/{year}")
     public List<CompactConference> getConferencesByYear(@PathVariable Short year) {
         return conferenceService.getConferencesByYear(year);
     }

@@ -25,12 +25,14 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Boolean emailVerified;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private Role role;
 
     @Column(name = "psuti_username")
     private String psutiUsername;
 
+    @Column(nullable = false)
     private String password;
 
     @Column(name = "firstname_ru", length = 50, nullable = false)
@@ -39,22 +41,22 @@ public class User implements UserDetails {
     @Column(name = "firstname_en", length = 50)
     private String firstnameEn;
 
-    @Column(name = "surname_ru", length = 100, nullable = false)
-    private String surnameRu;
-
-    @Column(name = "surname_en", length = 100)
-    private String surnameEn;
-
-    @Column(name = "lastname_ru", length = 50)
+    @Column(name = "lastname_ru", length = 100, nullable = false)
     private String lastnameRu;
 
-    @Column(name = "lastname_en", length = 50)
+    @Column(name = "lastname_en", length = 100)
     private String lastnameEn;
 
-    @Column(name = "country", length = 50, nullable = false)
+    @Column(name = "middlename_ru", length = 50)
+    private String middlenameRu;
+
+    @Column(name = "middlename_en", length = 50)
+    private String middlenameEn;
+
+    @Column(name = "country", length = 50)
     private String country;
 
-    @Column(name = "city", length = 50, nullable = false)
+    @Column(name = "city", length = 50)
     private String city;
 
     @Column(name = "organization")
