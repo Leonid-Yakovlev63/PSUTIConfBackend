@@ -3,7 +3,7 @@ package ru.psuti.conf.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tokens")
@@ -22,5 +22,5 @@ public class Token {
     private User user;
 
     @Column(nullable = false)
-    private ZonedDateTime expires;
+    private LocalDateTime expires;
 }

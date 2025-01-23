@@ -2,9 +2,11 @@ package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Entity
@@ -64,6 +66,10 @@ public class User implements UserDetails {
 
     @Column(name = "organization_address")
     private String organizationAddress;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
     @Override
     public String getUsername() {

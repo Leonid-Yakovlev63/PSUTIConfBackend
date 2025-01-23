@@ -12,7 +12,6 @@ import ru.psuti.conf.entity.User;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,12 +27,17 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public String extractType(String token) {
+        return extractClaim(token, v -> v.get("type")).toString();
+    }
+
     public String generateAccessToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User customUserDetails) {
             claims.put("id", customUserDetails.getId());
             claims.put("role", customUserDetails.getRole());
         }
+        claims.put("type", "access");
 
         long issuedAt = System.currentTimeMillis();
 
@@ -42,9 +46,10 @@ public class JwtService {
 
     public Pair<String, Date> generateRefreshToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "refresh");
 
         long issuedAt = System.currentTimeMillis();
-        Date expiration = new Date(issuedAt + 2L * 60 * 60 * 1000);
+        Date expiration = new Date(issuedAt + 30L * 24 * 60 * 60 * 1000);
 
         return Pair.of(generateToken(claims, userDetails, new Date(issuedAt), expiration), expiration);
     }

@@ -27,6 +27,7 @@ import ru.psuti.conf.service.JwtService;
 import ru.psuti.conf.service.UserService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 
@@ -63,7 +64,12 @@ public class AuthController {
         tokenRepository.save(Token.builder()
                 .user((User) user)
                 .token(refreshToken.getFirst())
-                .expires(refreshToken.getSecond().toInstant().atZone(ZoneId.systemDefault()))
+                .expires(
+                        refreshToken
+                                .getSecond().toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime()
+                )
                 .build());
 
         Cookie cookie = new Cookie("refreshToken", refreshToken.getFirst());
@@ -91,20 +97,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public AuthenticationSuccess refreshToken(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response) throws IOException {
-        Cookie[] cookies = request.getCookies();
-
-        if (ObjectUtils.isEmpty(cookies)) {
-            response.sendError(401);
-            return null;
-        }
-
-        String refreshToken = null;
-
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refreshToken")) {
-                refreshToken = cookie.getValue();
-            }
-        }
+        String refreshToken = getRefreshToken(request.getCookies());
 
         if (ObjectUtils.isEmpty(refreshToken)) {
             response.sendError(401);
@@ -116,7 +109,7 @@ public class AuthController {
         try {
             username = jwtService.extractUserName(refreshToken);
         } catch (JwtException e) {
-
+            log.debug("Обработано jwt исключение:", e);
         }
 
         if (ObjectUtils.isEmpty(username)) {
@@ -137,7 +130,11 @@ public class AuthController {
             tokenRepository.save(Token.builder()
                     .user(user)
                     .token(newRefreshToken.getFirst())
-                    .expires(newRefreshToken.getSecond().toInstant().atZone(ZoneId.systemDefault()))
+                    .expires(
+                            newRefreshToken.getSecond().toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime()
+                    )
                     .build());
             tokenRepository.delete(token.get());
 
@@ -151,6 +148,38 @@ public class AuthController {
 
             return new AuthenticationSuccess(accessToken);
         }
+        return null;
+    }
+
+    @PostMapping("/sign-out")
+    public boolean signOut(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response) {
+        String refreshToken = getRefreshToken(request.getCookies());
+
+        if (!ObjectUtils.isEmpty(refreshToken)) {
+            tokenRepository.deleteByToken(refreshToken);
+        }
+
+        var cookie = new Cookie("refreshToken", "");
+        cookie.setHttpOnly(true);
+        // cookie.setSecure(true);
+        cookie.setPath("/api/auth/refresh");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return true;
+    }
+
+    private String getRefreshToken(Cookie[] cookies) {
+        if (ObjectUtils.isEmpty(cookies)) {
+            return null;
+        }
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("refreshToken")) {
+                return cookie.getValue();
+            }
+        }
+
         return null;
     }
 

@@ -3,7 +3,7 @@ package ru.psuti.conf.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "email_confirm_code")
@@ -23,9 +23,9 @@ public class EmailConfirmationCode {
     private User user;
 
     @Column(name = "created_at", nullable = false)
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private ZonedDateTime expires;
+    private LocalDateTime expires;
 
 }

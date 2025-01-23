@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         String path = request.getServletPath();
-        log.debug("Пришёл запрос по пути: {}", path);
+        log.info("Пришёл запрос по пути: {}", path);
         if (path.startsWith("/auth/")) {
             filterChain.doFilter(request, response);
             return;
@@ -58,9 +58,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String username = jwtService.extractUserName(token);
             log.debug("Обработка токена пользователя: {}", username);
 
+            if (!jwtService.extractType(token).equals("access")) {
+                tokenRepository.deleteByToken(token);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             if (!ObjectUtils.isEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userService.getByUsername(username);
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+                if (!jwtService.isTokenValid(token, userDetails)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
