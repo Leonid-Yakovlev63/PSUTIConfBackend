@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class EmailConfirmationCode {
 
     @Id
-    @Column(nullable = false, unique = true, length = 32)
+    @Column(nullable = false, unique = true, length = 64)
     private String code;
 
     @ManyToOne(targetEntity = User.class, cascade = CascadeType.MERGE)
