@@ -13,21 +13,18 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.psuti.conf.dto.request.SignIn;
 import ru.psuti.conf.dto.request.SignUp;
 import ru.psuti.conf.dto.response.AuthenticationSuccess;
 import ru.psuti.conf.entity.Token;
 import ru.psuti.conf.entity.User;
 import ru.psuti.conf.repository.TokenRepository;
+import ru.psuti.conf.service.ConfirmationService;
 import ru.psuti.conf.service.JwtService;
 import ru.psuti.conf.service.UserService;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 
@@ -37,6 +34,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationManager authenticationManager;
+    private final ConfirmationService confirmationService;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
@@ -44,11 +42,6 @@ public class AuthController {
 
     @PostMapping("/sign-in")
     public AuthenticationSuccess signIn(@RequestBody @Valid SignIn request, HttpServletResponse response) throws IOException {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
-                request.getPassword()
-        ));
-
         var user = userService
                 .userDetailsService()
                 .loadUserByUsername(request.getEmail());
@@ -57,6 +50,11 @@ public class AuthController {
             response.sendError(403, "Please verify your email address to activate your account.");
             return null;
         }
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                request.getEmail(),
+                request.getPassword()
+        ));
 
         var accessToken = jwtService.generateAccessToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -91,6 +89,8 @@ public class AuthController {
             response.sendError(HttpServletResponse.SC_CONFLICT, "User email already in use.");
             return null;
         }
+
+        confirmationService.createEmailConfirmationCode(user.get());
 
         return ResponseEntity.status(HttpServletResponse.SC_CREATED).body("Confirm email.");
     }
@@ -152,7 +152,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-out")
-    public boolean signOut(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response) {
+    public boolean signOut(@NonNull HttpServletRequest request, @RequestParam(required = false) String lang, @NonNull HttpServletResponse response) {
         String refreshToken = getRefreshToken(request.getCookies());
 
         if (!ObjectUtils.isEmpty(refreshToken)) {
@@ -181,6 +181,29 @@ public class AuthController {
         }
 
         return null;
+    }
+
+    @GetMapping("/confirm-email")
+    public ResponseEntity<Object> getNewConfirmEmailCode(@RequestParam String email, @RequestParam(required = false) String lang, @NonNull HttpServletResponse response) throws IOException {
+        User user = userService.getByUsername(email);
+
+        if (user == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "");
+            return null;
+        }
+
+        Long createdAt = confirmationService.createEmailConfirmationCodeIfNotCreated(user);
+
+        if (createdAt != null) {
+            return ResponseEntity.status(429).body(createdAt);
+        }
+
+        return ResponseEntity.ok("Ok");
+    }
+
+    @PostMapping("/confirm-email")
+    public ResponseEntity<String> confirmEmail(@RequestParam String code) {
+        return confirmationService.confirmEmail(code);
     }
 
 }
