@@ -25,7 +25,7 @@ public class CompactConference {
     public CompactConference(Conference conference) {
         this.id = conference.getId();
         this.slug = conference.getSlug();
-        this.isEnglishEnable = conference.getIsEnglishEnable();
+        this.isEnglishEnable = conference.getIsEnglishEnabled();
         this.conferenceNameRu = conference.getConferenceNameRu();
         this.conferenceNameEn = conference.getConferenceNameEn();
         this.statusRu = conference.getStatusRu();
