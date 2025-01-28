@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+
+import ru.psuti.conf.entity.Role;
 import ru.psuti.conf.entity.User;
 import ru.psuti.conf.repository.UserRepository;
 
@@ -45,6 +47,7 @@ public class AppInitializer {
                             .password(password)
                             .emailVerified(true)
                             .firstnameRu("admin")
+                            .role(Role.ADMIN)
                             .lastnameRu("admin")
                             .build()
             );
