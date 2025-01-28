@@ -13,8 +13,11 @@ import java.util.Optional;
 @Repository
 public interface ConferenceRepository extends JpaRepository<Conference, Long> {
 
-    @Query(value = "SELECT * FROM conferences AS c WHERE extract(year from c.start_date) = :year", nativeQuery = true)
-    List<Conference> findConferencesByYear(@Param("year") Short year);
+    @Query(value = "SELECT * FROM conferences AS c WHERE extract(year from c.start_date) = :year AND is_enabled = true", nativeQuery = true)
+    List<Conference> findActiveConferencesByYear(@Param("year") Short year);
+
+    @Query(value = "SELECT * FROM conferences AS c WHERE is_enabled = false", nativeQuery = true)
+    List<Conference> findInactiveConferences();
 
     Optional<Conference> findConferenceBySlug(String slug);
 

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -95,6 +96,7 @@ public class WebSecurityConfig {
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers("/users/me").authenticated()
                             .requestMatchers("/users/**").hasRole(Role.ADMIN.name())
+                            .requestMatchers(HttpMethod.POST, "/conferences").hasRole(Role.ADMIN.name())
                             .anyRequest().permitAll();
                 })
                 .authenticationProvider(authenticationProvider())

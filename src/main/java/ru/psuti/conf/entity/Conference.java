@@ -1,10 +1,7 @@
 package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "conferences")
@@ -25,8 +23,11 @@ public class Conference {
     @Column(unique = true, nullable = false)
     private String slug;
 
-    @Column(name = "is_english_enable", nullable = false)
-    private Boolean isEnglishEnable;
+    @Column(name = "is_enabled", nullable = false)
+    private Boolean isEnabled;
+
+    @Column(name = "is_english_enabled", nullable = false)
+    private Boolean isEnglishEnabled;
 
     @Column(name = "conference_name_ru", nullable = false)
     private String conferenceNameRu;
@@ -67,4 +68,14 @@ public class Conference {
     private List<ConferenceOrganizer> conferenceOrganizers = new ArrayList<ConferenceOrganizer>();
 
 
+    @ManyToMany(cascade = {CascadeType.MERGE})
+    @JoinTable(
+            name = "conferences_admins",
+            joinColumns = @JoinColumn(name = "conference_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> admins = new ArrayList<User>();
+
+    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
+    private List<ConferencePage> conferencePages = new ArrayList<ConferencePage>();
 }
