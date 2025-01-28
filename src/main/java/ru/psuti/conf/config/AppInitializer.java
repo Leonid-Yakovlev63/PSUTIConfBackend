@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -22,6 +23,7 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class AppInitializer {
     private static final SecureRandom secureRandom = new SecureRandom();
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     @Value("${files.upload-dir}")
@@ -44,7 +46,7 @@ public class AppInitializer {
             userRepository.save(
                     User.builder()
                             .email(adminEmail)
-                            .password(password)
+                            .password(passwordEncoder.encode(password))
                             .emailVerified(true)
                             .firstnameRu("admin")
                             .role(Role.ADMIN)
