@@ -10,7 +10,6 @@ import ru.psuti.conf.entity.User;
 import ru.psuti.conf.repository.EmailConfirmationCodeRepository;
 
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;

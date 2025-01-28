@@ -5,13 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.java.Log;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "conference_page")
+@Entity(name = "conference_pages")
 public class ConferencePage {
 
     @Id
@@ -31,7 +30,7 @@ public class ConferencePage {
     private String htmlContent;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conference")
+    @JoinColumn(name = "conference_id")
     private Conference conference;
 
 }

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.psuti.conf.dto.request.CreateConferenceDto;
 import ru.psuti.conf.dto.response.CompactConference;
 import ru.psuti.conf.entity.Conference;
-import ru.psuti.conf.entity.User;
+import ru.psuti.conf.repository.ConferencePageRepository;
 import ru.psuti.conf.repository.ConferenceRepository;
 
 import java.time.LocalDate;
@@ -19,8 +19,11 @@ public class ConferenceService {
     @Autowired
     private ConferenceRepository conferenceRepository;
 
-    public List<Conference> getConferences() {
-        return conferenceRepository.findAll();
+    @Autowired
+    private ConferencePageRepository conferencePageRepository;
+
+    public List<CompactConference> getConferences() {
+        return conferenceRepository.findAll().stream().map(CompactConference::new).collect(Collectors.toList());
     }
 
     public Optional<Conference> getConferenceById(Long id) {
