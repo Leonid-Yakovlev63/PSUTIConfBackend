@@ -55,6 +55,9 @@ public class User implements UserDetails {
     @Column(name = "middlename_en", length = 50)
     private String middlenameEn;
 
+    @Column(name = "photo")
+    private String photo;
+
     @Column(name = "country", length = 50)
     private String country;
 

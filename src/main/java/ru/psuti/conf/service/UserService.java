@@ -1,6 +1,9 @@
 package ru.psuti.conf.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,11 +16,18 @@ import ru.psuti.conf.entity.User;
 import ru.psuti.conf.repository.EmailChangeCodeRepository;
 import ru.psuti.conf.repository.UserRepository;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+
     private final UserRepository userRepository;
 
     private final EmailChangeCodeRepository emailChangeCodeRepository;
@@ -68,4 +78,28 @@ public class UserService {
         return userRepository.existsById(id);
     }
 
+    public Resource getProfilePhoto(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (!userOptional.isPresent()) {
+            return null;
+        }
+        User user = userOptional.get();
+        String pathToPhoto = user.getPhoto();
+        if (pathToPhoto == null) {
+            return null;
+        }
+        String uploadDir = new File("src/main/resources/static/public/photos").getAbsolutePath();
+        Path filePath = Paths.get(uploadDir).resolve(pathToPhoto).normalize();
+        try {
+            Resource resource = resourceLoader.getResource("file:" + filePath.toString());
+            if (resource.exists()) {
+                return resource;
+            } else {
+                return null;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 }
