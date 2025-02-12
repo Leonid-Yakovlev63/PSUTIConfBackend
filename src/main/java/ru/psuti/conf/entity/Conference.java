@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,14 +48,20 @@ public class Conference {
     @Column(name = "description_en")
     private String descriptionEn;
 
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private ZonedDateTime updatedAt;
+
     @Column(name = "start_date")
-    private LocalDate startDate;
+    private ZonedDateTime startDate;
 
     @Column(name = "end_date")
-    private LocalDate endDate;
+    private ZonedDateTime endDate;
 
     @Column(name = "closing_date_for_applications")
-    private LocalDate closingDateForApplications;
+    private ZonedDateTime closingDateForApplications;
 
     @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
     private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>();

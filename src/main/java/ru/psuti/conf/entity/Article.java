@@ -1,16 +1,14 @@
 package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "articles")
@@ -36,6 +34,12 @@ public class Article {
     @JoinColumn(name = "section_id")
     private ConferenceSection section;
 
+    @Column(name = "udk")
+    private String udk; // Классификатор УДК
+
+    @Column(name = "udk_link")
+    private String udkLink; // Ссылка на УДК
+
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinTable(
             name = "articles_authors",
@@ -43,5 +47,9 @@ public class Article {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> authors = new ArrayList<User>();
+
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @JoinColumn(name = "file_info_id")
+    private ArticleFileInfo fileInfo;
 
 }
