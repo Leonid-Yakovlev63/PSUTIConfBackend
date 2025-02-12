@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.psuti.conf.entity.ImageFileInfo;
 import ru.psuti.conf.entity.Role;
 import ru.psuti.conf.entity.User;
@@ -18,6 +19,7 @@ import ru.psuti.conf.repository.EmailChangeCodeRepository;
 import ru.psuti.conf.repository.UserRepository;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -28,6 +30,9 @@ public class UserService {
 
     @Autowired
     private ResourceLoader resourceLoader;
+
+    @Autowired
+    private ImageFileInfoService imageFileInfoService;
 
     private final UserRepository userRepository;
 
@@ -103,5 +108,16 @@ public class UserService {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public ImageFileInfo uploadProfileInfo(ImageFileInfo imageFileInfo, MultipartFile multipartFile, Long userId) throws IOException {
+
+        User user = userRepository.getById(userId);
+
+        var image = imageFileInfoService.saveImageFileInfo(imageFileInfo, multipartFile);
+        user.setImageFileInfo(image);
+        userRepository.save(user);
+
+        return image;
     }
 }

@@ -24,7 +24,7 @@ public class ArticleService {
 
     private static final String PDF_EXTENSION = "pdf";
 
-    private static final String FILE_UPLOAD_DIR = "src/main/resources/static/articles/";
+    private static final String FILE_UPLOAD_DIR = "src/main/resources/static/public/articles/";
 
     public Article createArticle(Article article, MultipartFile file) throws IOException {
 

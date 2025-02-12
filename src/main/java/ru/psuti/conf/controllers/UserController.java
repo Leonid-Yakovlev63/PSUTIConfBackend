@@ -2,15 +2,18 @@ package ru.psuti.conf.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.core.io.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.psuti.conf.dto.response.CompactUserDto;
+import ru.psuti.conf.entity.ImageFileInfo;
+import ru.psuti.conf.entity.User;
 import ru.psuti.conf.service.UserService;
 
+import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @RestController
@@ -34,5 +37,18 @@ public class UserController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    @PostMapping("/me/photo")
+    public ResponseEntity<String> uploadProfilePhoto(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+        Optional<Long> optionalUserId = UserService.getCurrentUser().map(User::getId);
+        Long userId = optionalUserId.get();
+        ImageFileInfo imageFileInfo = ImageFileInfo.builder()
+                .name(multipartFile.getOriginalFilename())
+                .uploadDate(ZonedDateTime.now())
+                .size(multipartFile.getSize())
+                .build();
+        ImageFileInfo uploadedImageFileInfo = userService.uploadProfileInfo(imageFileInfo, multipartFile, userId);
+        return new ResponseEntity<String>("Image uploaded successfully", HttpStatus.OK);
     }
 }

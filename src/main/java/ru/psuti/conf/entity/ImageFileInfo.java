@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -22,6 +23,6 @@ public class ImageFileInfo {
     private Long size;
 
     @Column(name = "upload_date")
-    private LocalDate uploadDate;
+    private ZonedDateTime uploadDate;
 
 }
