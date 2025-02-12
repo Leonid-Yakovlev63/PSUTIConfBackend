@@ -5,6 +5,7 @@ import lombok.Value;
 import ru.psuti.conf.entity.Conference;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,8 +23,8 @@ public class CompactConference {
     String conferenceNameEn;
     String statusRu;
     String statusEn;
-    LocalDate startDate;
-    LocalDate endDate;
+    ZonedDateTime startDate;
+    ZonedDateTime endDate;
     List<CompactConferencePage> compactConferencePages;
 
     public CompactConference(Conference conference) {
