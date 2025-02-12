@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Length;
 import ru.psuti.conf.entity.Conference;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 /**
  * DTO for {@link ru.psuti.conf.entity.Conference}
@@ -31,9 +32,9 @@ public class CreateConferenceDto {
 
     String statusEn;
 
-    LocalDate startDate;
+    ZonedDateTime startDate;
 
-    LocalDate endDate;
+    ZonedDateTime endDate;
 
     public Conference toConference() {
         return Conference.builder()
