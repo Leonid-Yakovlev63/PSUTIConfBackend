@@ -3,12 +3,11 @@ package ru.psuti.conf.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.psuti.conf.entity.Article;
-import ru.psuti.conf.entity.FileInfo;
+import ru.psuti.conf.entity.ArticleFileInfo;
 import ru.psuti.conf.entity.FileType;
 import ru.psuti.conf.repository.ArticleRepository;
 import ru.psuti.conf.repository.FileRepository;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,7 +47,7 @@ public class ArticleService {
                 throw new IllegalArgumentException("Unsupported file format");
         }
 
-        FileInfo fileInfo = FileInfo.builder()
+        ArticleFileInfo fileInfo = ArticleFileInfo.builder()
                 .name(fileName)
                 .size(file.getSize())
                 .fileType(fileType)

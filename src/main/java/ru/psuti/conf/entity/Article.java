@@ -50,6 +50,6 @@ public class Article {
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "file_info_id")
-    private FileInfo fileInfo;
+    private ArticleFileInfo fileInfo;
 
 }

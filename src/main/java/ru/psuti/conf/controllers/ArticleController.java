@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.psuti.conf.entity.Article;
-import ru.psuti.conf.entity.FileInfo;
 import ru.psuti.conf.service.ArticleService;
 
 import java.io.IOException;
