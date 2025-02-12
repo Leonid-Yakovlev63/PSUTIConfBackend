@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.psuti.conf.entity.ImageFileInfo;
 import ru.psuti.conf.entity.Role;
 import ru.psuti.conf.entity.User;
 import ru.psuti.conf.repository.EmailChangeCodeRepository;
@@ -84,7 +85,8 @@ public class UserService {
             return null;
         }
         User user = userOptional.get();
-        String pathToPhoto = user.getPhoto();
+        ImageFileInfo userImageFileInfo = user.getImageFileInfo();
+        String pathToPhoto = userImageFileInfo.getName();
         if (pathToPhoto == null) {
             return null;
         }

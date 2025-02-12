@@ -55,8 +55,9 @@ public class User implements UserDetails {
     @Column(name = "middlename_en", length = 50)
     private String middlenameEn;
 
-    @Column(name = "photo")
-    private String photo;
+    @OneToOne
+    @JoinColumn(name = "image_file_info", referencedColumnName = "id")
+    private ImageFileInfo imageFileInfo;
 
     @Column(name = "country", length = 50)
     private String country;
