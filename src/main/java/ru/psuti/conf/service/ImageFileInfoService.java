@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ImageFileInfoService {
@@ -21,7 +22,7 @@ public class ImageFileInfoService {
 
     @Autowired
     private ImageFileInfoRepository imageFileInfoRepository;
-
+    // Поменять папку
     private static final String FILE_UPLOAD_DIR = "src/main/resources/static/public/photos/";
 
     public Optional<ImageFileInfo> getImageFileInfoById(Long id) {
@@ -29,12 +30,16 @@ public class ImageFileInfoService {
     }
 
     public ImageFileInfo saveImageFileInfo(ImageFileInfo imageFileInfo, MultipartFile multipartFile) throws IOException {
-        String fileName = multipartFile.getOriginalFilename();
-        if (fileName == null || !fileName.contains(".")) {
+        String originalFileName = multipartFile.getOriginalFilename();
+
+        if (originalFileName == null || !originalFileName.contains(".")) {
             throw new IllegalArgumentException("Invalid file format");
         }
 
-        Path path = Paths.get(FILE_UPLOAD_DIR + fileName);
+        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String newFileName = UUID.randomUUID() + "." + fileExtension;
+        imageFileInfo.setName(newFileName);
+        Path path = Paths.get(FILE_UPLOAD_DIR + newFileName);
 
         Files.copy(multipartFile.getInputStream(), path);
 
