@@ -22,8 +22,14 @@ public class ImageFileInfoService {
 
     @Autowired
     private ImageFileInfoRepository imageFileInfoRepository;
-    // Поменять папку
-    private static final String FILE_UPLOAD_DIR = "src/main/resources/static/public/photos/";
+
+    private static final String PNG_EXTENSION = "png";
+
+    private static final String JPG_EXTENSION = "jpg";
+
+    private static final String JPEG_EXTENSION = "jpeg";
+
+    private static final String FILE_UPLOAD_DIR = "uploads/public/photos/";
 
     public Optional<ImageFileInfo> getImageFileInfoById(Long id) {
         return imageFileInfoRepository.findById(id);
@@ -35,9 +41,13 @@ public class ImageFileInfoService {
         if (originalFileName == null || !originalFileName.contains(".")) {
             throw new IllegalArgumentException("Invalid file format");
         }
+        String lowerCaseFileName = originalFileName.toLowerCase();
+        if (!lowerCaseFileName.endsWith(PNG_EXTENSION) && !lowerCaseFileName.endsWith(JPG_EXTENSION) && !lowerCaseFileName.endsWith(JPEG_EXTENSION)) {
+            throw new IllegalArgumentException("Unsupported file format. Acceptable formats: png, jpg, jpeg");
+        }
 
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        String newFileName = UUID.randomUUID() + "." + fileExtension;
+        String newFileName = UUID.randomUUID() + fileExtension;
         imageFileInfo.setName(newFileName);
         Path path = Paths.get(FILE_UPLOAD_DIR + newFileName);
 
