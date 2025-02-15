@@ -89,6 +89,11 @@ public class ConferenceController {
         return new ResponseEntity<String>("Conference create successfully", HttpStatus.CREATED);
     }
 
+    @GetMapping("/new")
+    public List<CompactConference> getNewConferences() {
+        return conferenceService.getNewConferences();
+    }
+
     private boolean hasPermission(Conference conference){
         Optional<User> optionalUser = UserService.getCurrentUser();
         if(optionalUser.isEmpty()){

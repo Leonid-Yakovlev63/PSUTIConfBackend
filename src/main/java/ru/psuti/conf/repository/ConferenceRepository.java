@@ -23,7 +23,7 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
 
     List<Conference> findByEndDateGreaterThanEqual(LocalDate now);
 
-    @Query(value = "SELECT DISTINCT EXTRACT(YEAR FROM c.start_date) AS year FROM conferences AS c ORDER BY year ASC", nativeQuery = true)
+    @Query(value = "SELECT DISTINCT EXTRACT(YEAR FROM c.start_date) AS year FROM conferences AS c WHERE c.is_enabled ORDER BY year ASC", nativeQuery = true)
     List<Short> findYears();
 
 }

@@ -38,6 +38,10 @@ public class ConferenceService {
         return conferenceRepository.findByEndDateGreaterThanEqual(LocalDate.now()).stream().map(CompactConference::new).collect(Collectors.toList());
     }
 
+    public List<CompactConference> getNewConferences() {
+        return conferenceRepository.findInactiveConferences().stream().map(CompactConference::new).toList();
+    }
+
     public Optional<Conference> getConferenceBySlug(String slug) {
 
         return conferenceRepository.findConferenceBySlug(slug);
