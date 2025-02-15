@@ -12,6 +12,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.psuti.conf.dto.request.SignIn;
@@ -96,6 +97,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Transactional
     public AuthenticationSuccess refreshToken(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response) throws IOException {
         String refreshToken = getRefreshToken(request.getCookies());
 
