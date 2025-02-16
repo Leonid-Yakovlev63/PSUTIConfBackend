@@ -53,6 +53,21 @@ public class Conference {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @Column(name = "meeting_point_ru")
+    private String meetingPointRu;
+
+    @Column(name = "meeting_point_en")
+    private String meetingPointEn;
+
+    @Column(name = "web_site")
+    private String webSite;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
     @Column(name = "closing_date_for_applications")
     private LocalDate closingDateForApplications;
 
