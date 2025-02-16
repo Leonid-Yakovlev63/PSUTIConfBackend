@@ -2,6 +2,7 @@ package ru.psuti.conf.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.psuti.conf.dto.request.CreateConferenceDto;
 import ru.psuti.conf.dto.response.CompactConference;
 import ru.psuti.conf.entity.Conference;
@@ -51,16 +52,12 @@ public class ConferenceService {
         return conferenceRepository.findYears();
     }
 
-    public Conference createConference(CreateConferenceDto createConferenceDto){
-        return conferenceRepository.save(Conference.builder()
-                        .slug(createConferenceDto.getSlug())
-                        .isEnglishEnabled(createConferenceDto.getIsEnglishEnabled())
-                        .conferenceNameRu(createConferenceDto.getConferenceNameRu())
-                        .conferenceNameEn(createConferenceDto.getConferenceNameEn())
-                        .statusRu(createConferenceDto.getStatusRu())
-                        .statusEn(createConferenceDto.getStatusEn())
-                        .startDate(createConferenceDto.getStartDate())
-                        .endDate(createConferenceDto.getEndDate())
-                .build());
+    @Transactional
+    public Optional<Conference> createConference(CreateConferenceDto createConferenceDto){
+        if (conferenceRepository.existsBySlug(createConferenceDto.getSlug()))
+            return Optional.empty();
+        return Optional.of(conferenceRepository.save(
+                createConferenceDto.toConference()
+        ));
     }
 }

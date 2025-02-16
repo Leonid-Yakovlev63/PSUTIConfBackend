@@ -1,6 +1,7 @@
 package ru.psuti.conf.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 import ru.psuti.conf.entity.Conference;
@@ -17,13 +18,13 @@ public class CreateConferenceDto {
     @Length(max = 255)
     String slug;
 
+    @NotNull
     Boolean isEnglishEnabled;
 
     @NotBlank
     @Length(max = 255)
     String conferenceNameRu;
 
-    @NotBlank
     @Length(max = 255)
     String conferenceNameEn;
 

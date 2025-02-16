@@ -1,8 +1,12 @@
 package ru.psuti.conf.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.psuti.conf.dto.request.CreateConferenceDto;
 import ru.psuti.conf.dto.response.CompactConference;
@@ -84,9 +88,10 @@ public class ConferenceController {
     }
 
     @PostMapping()
-    public ResponseEntity<String> createConference(@RequestBody CreateConferenceDto createConferenceDto) {
-        conferenceService.createConference(createConferenceDto);
-        return new ResponseEntity<String>("Conference create successfully", HttpStatus.CREATED);
+    public ResponseEntity<String> createConference(@RequestBody @Valid CreateConferenceDto createConferenceDto) {
+        if (conferenceService.createConference(createConferenceDto).isEmpty())
+            return new ResponseEntity<>("A conference with this slug already exists", HttpStatus.CONFLICT);
+        return new ResponseEntity<>("Conference create successfully", HttpStatus.CREATED);
     }
 
     @GetMapping("/new")

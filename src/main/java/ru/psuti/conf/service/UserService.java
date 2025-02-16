@@ -28,6 +28,7 @@ public class UserService {
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getPrincipal)
+                .filter(principal -> !"anonymousUser".equals(principal))
                 .map(User.class::cast);
     }
 

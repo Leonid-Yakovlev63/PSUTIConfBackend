@@ -26,4 +26,6 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
     @Query(value = "SELECT DISTINCT EXTRACT(YEAR FROM c.start_date) AS year FROM conferences AS c WHERE c.is_enabled ORDER BY year ASC", nativeQuery = true)
     List<Short> findYears();
 
+    boolean existsBySlug(String slug);
+
 }
