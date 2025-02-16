@@ -36,7 +36,7 @@ public class ConferenceService {
     }
 
     public List<CompactConference> getCurrentConferences() {
-        return conferenceRepository.findByEndDateGreaterThanEqual(LocalDate.now()).stream().map(CompactConference::new).collect(Collectors.toList());
+        return conferenceRepository.findByEndDateGreaterThanEqualAndIsEnabledTrue(LocalDate.now()).stream().map(CompactConference::new).collect(Collectors.toList());
     }
 
     public List<CompactConference> getNewConferences() {
