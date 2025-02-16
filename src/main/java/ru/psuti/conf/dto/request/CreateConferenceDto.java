@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 import ru.psuti.conf.entity.Conference;
+import ru.psuti.conf.validation.anotation.ConferenceNameEnRequiredIfEnglishEnabled;
 
 import java.time.LocalDate;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
  * DTO for {@link ru.psuti.conf.entity.Conference}
  */
 @Value
+@ConferenceNameEnRequiredIfEnglishEnabled
 public class CreateConferenceDto {
 
     @NotBlank
