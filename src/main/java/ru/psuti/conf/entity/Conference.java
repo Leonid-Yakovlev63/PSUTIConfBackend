@@ -2,10 +2,12 @@ package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -47,6 +49,14 @@ public class Conference {
     @Column(name = "description_en")
     private String descriptionEn;
 
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private ZonedDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private ZonedDateTime updatedAt;
+
     @Column(name = "start_date")
     private LocalDate startDate;
 
@@ -69,7 +79,7 @@ public class Conference {
     private String phone;
 
     @Column(name = "closing_date_for_applications")
-    private LocalDate closingDateForApplications;
+    private ZonedDateTime closingDateForApplications;
 
     @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
     private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>();
