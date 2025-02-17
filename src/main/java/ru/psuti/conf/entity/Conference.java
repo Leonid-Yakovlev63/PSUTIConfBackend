@@ -28,6 +28,9 @@ public class Conference {
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled;
 
+    @Column(name = "is_enabled_for_registration", nullable = false)
+    private Boolean isEnabledForRegistration;
+
     @Column(name = "is_english_enabled", nullable = false)
     private Boolean isEnglishEnabled;
 
