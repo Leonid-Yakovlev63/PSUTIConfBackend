@@ -5,6 +5,8 @@ import lombok.Value;
 import ru.psuti.conf.entity.Conference;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * DTO for {@link ru.psuti.conf.entity.Conference}
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 public class CompactConference {
     Long id;
     String slug;
+    Boolean isEnabled;
     Boolean isEnglishEnable;
     String conferenceNameRu;
     String conferenceNameEn;
@@ -21,17 +24,22 @@ public class CompactConference {
     String statusEn;
     LocalDate startDate;
     LocalDate endDate;
+    List<CompactConferencePage> compactConferencePages;
 
     public CompactConference(Conference conference) {
         this.id = conference.getId();
         this.slug = conference.getSlug();
-        this.isEnglishEnable = conference.getIsEnglishEnable();
+        this.isEnabled = conference.getIsEnabled();
+        this.isEnglishEnable = conference.getIsEnglishEnabled();
         this.conferenceNameRu = conference.getConferenceNameRu();
         this.conferenceNameEn = conference.getConferenceNameEn();
         this.statusRu = conference.getStatusRu();
         this.statusEn = conference.getStatusEn();
         this.startDate = conference.getStartDate();
         this.endDate = conference.getEndDate();
+        this.compactConferencePages = conference.getConferencePages().stream()
+                .map(CompactConferencePage::new)
+                .collect(Collectors.toList());
     }
 
 }

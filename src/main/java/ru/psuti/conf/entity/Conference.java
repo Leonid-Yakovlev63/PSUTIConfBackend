@@ -1,18 +1,18 @@
 package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "conferences")
@@ -25,8 +25,14 @@ public class Conference {
     @Column(unique = true, nullable = false)
     private String slug;
 
-    @Column(name = "is_english_enable", nullable = false)
-    private Boolean isEnglishEnable;
+    @Column(name = "is_enabled", nullable = false)
+    private Boolean isEnabled;
+
+    @Column(name = "is_enabled_for_registration", nullable = false)
+    private Boolean isEnabledForRegistration;
+
+    @Column(name = "is_english_enabled", nullable = false)
+    private Boolean isEnglishEnabled;
 
     @Column(name = "conference_name_ru", nullable = false)
     private String conferenceNameRu;
@@ -46,14 +52,37 @@ public class Conference {
     @Column(name = "description_en")
     private String descriptionEn;
 
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private ZonedDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private ZonedDateTime updatedAt;
+
     @Column(name = "start_date")
     private LocalDate startDate;
 
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @Column(name = "meeting_point_ru")
+    private String meetingPointRu;
+
+    @Column(name = "meeting_point_en")
+    private String meetingPointEn;
+
+    @Column(name = "web_site")
+    private String webSite;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
     @Column(name = "closing_date_for_applications")
-    private LocalDate closingDateForApplications;
+    private ZonedDateTime closingDateForApplications;
 
     @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
     private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>();
@@ -67,4 +96,14 @@ public class Conference {
     private List<ConferenceOrganizer> conferenceOrganizers = new ArrayList<ConferenceOrganizer>();
 
 
+    @ManyToMany(cascade = {CascadeType.MERGE})
+    @JoinTable(
+            name = "conferences_admins",
+            joinColumns = @JoinColumn(name = "conference_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> admins = new ArrayList<User>();
+
+    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
+    private List<ConferencePage> conferencePages = new ArrayList<ConferencePage>();
 }

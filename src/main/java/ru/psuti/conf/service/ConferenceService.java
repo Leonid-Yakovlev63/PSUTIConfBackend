@@ -2,8 +2,11 @@ package ru.psuti.conf.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.psuti.conf.dto.request.CreateConferenceDto;
 import ru.psuti.conf.dto.response.CompactConference;
 import ru.psuti.conf.entity.Conference;
+import ru.psuti.conf.repository.ConferencePageRepository;
 import ru.psuti.conf.repository.ConferenceRepository;
 
 import java.time.LocalDate;
@@ -17,8 +20,11 @@ public class ConferenceService {
     @Autowired
     private ConferenceRepository conferenceRepository;
 
-    public List<Conference> getConferences() {
-        return conferenceRepository.findAll();
+    @Autowired
+    private ConferencePageRepository conferencePageRepository;
+
+    public List<CompactConference> getConferences() {
+        return conferenceRepository.findAll().stream().map(CompactConference::new).collect(Collectors.toList());
     }
 
     public Optional<Conference> getConferenceById(Long id) {
@@ -26,11 +32,15 @@ public class ConferenceService {
     }
 
     public List<CompactConference> getConferencesByYear(Short year) {
-        return conferenceRepository.findConferencesByYear(year).stream().map(CompactConference::new).collect(Collectors.toList());
+        return conferenceRepository.findActiveConferencesByYear(year).stream().map(CompactConference::new).collect(Collectors.toList());
     }
 
     public List<CompactConference> getCurrentConferences() {
-        return conferenceRepository.findByEndDateGreaterThanEqual(LocalDate.now()).stream().map(CompactConference::new).collect(Collectors.toList());
+        return conferenceRepository.findByEndDateGreaterThanEqualAndIsEnabledTrue(LocalDate.now()).stream().map(CompactConference::new).collect(Collectors.toList());
+    }
+
+    public List<CompactConference> getNewConferences() {
+        return conferenceRepository.findInactiveConferences().stream().map(CompactConference::new).toList();
     }
 
     public Optional<Conference> getConferenceBySlug(String slug) {
@@ -40,5 +50,14 @@ public class ConferenceService {
 
     public List<Short> getYears() {
         return conferenceRepository.findYears();
+    }
+
+    @Transactional
+    public Optional<Conference> createConference(CreateConferenceDto createConferenceDto){
+        if (conferenceRepository.existsBySlug(createConferenceDto.getSlug()))
+            return Optional.empty();
+        return Optional.of(conferenceRepository.save(
+                createConferenceDto.toConference()
+        ));
     }
 }
