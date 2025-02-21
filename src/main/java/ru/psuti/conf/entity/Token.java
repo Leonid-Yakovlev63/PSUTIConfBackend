@@ -2,6 +2,7 @@ package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.psuti.conf.entity.auth.User;
 
 import java.time.LocalDateTime;
 

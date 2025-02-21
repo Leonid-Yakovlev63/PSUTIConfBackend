@@ -4,15 +4,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.psuti.conf.dto.request.CreateConferenceDto;
 import ru.psuti.conf.dto.response.CompactConference;
-import ru.psuti.conf.entity.Conference;
-import ru.psuti.conf.entity.Role;
-import ru.psuti.conf.entity.User;
+import ru.psuti.conf.entity.*;
+import ru.psuti.conf.entity.auth.PermissionFlags;
+import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.service.ConferenceService;
 import ru.psuti.conf.service.UserService;
 
@@ -100,19 +97,14 @@ public class ConferenceController {
     }
 
     private boolean hasPermission(Conference conference){
-        Optional<User> optionalUser = UserService.getCurrentUser();
-        if(optionalUser.isEmpty()){
-            return false;
-        }
-        User user = optionalUser.get();
-        if(user.getRole().equals(Role.ADMIN)) {
-            return true;
-        }
-        for (User admin: conference.getAdmins()){
-            if (Objects.equals(admin.getId(), user.getId()))
-                return true;
-        }
-        return false;
+        return UserService.getCurrentUser()
+                .filter(user -> Role.ADMIN.equals(user.getRole()) ||
+                        conference.getConferenceUserPermissions().stream()
+                                .anyMatch(p ->
+                                        Objects.equals(p.getUser().getId(), user.getId()) &&
+                                        p.hasAnyPermission(PermissionFlags.ADMIN, PermissionFlags.READ)
+                                )
+                ).isPresent();
     }
 
 }

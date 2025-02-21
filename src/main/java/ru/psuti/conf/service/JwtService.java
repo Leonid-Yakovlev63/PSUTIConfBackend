@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import ru.psuti.conf.entity.User;
+import ru.psuti.conf.entity.auth.User;
 
 import javax.crypto.SecretKey;
 import java.security.Key;

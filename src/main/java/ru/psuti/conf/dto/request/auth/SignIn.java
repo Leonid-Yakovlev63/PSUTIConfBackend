@@ -1,4 +1,4 @@
-package ru.psuti.conf.dto.request;
+package ru.psuti.conf.dto.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

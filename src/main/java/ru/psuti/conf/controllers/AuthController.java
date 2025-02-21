@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,11 +17,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.psuti.conf.dto.request.SignIn;
-import ru.psuti.conf.dto.request.SignUp;
-import ru.psuti.conf.dto.response.AuthenticationSuccess;
+import ru.psuti.conf.dto.request.auth.SignIn;
+import ru.psuti.conf.dto.request.auth.SignUpDTO;
+import ru.psuti.conf.dto.response.auth.AuthenticationSuccessDTO;
 import ru.psuti.conf.entity.Token;
-import ru.psuti.conf.entity.User;
+import ru.psuti.conf.entity.auth.User;
+import ru.psuti.conf.entity.auth.UserLocalized;
 import ru.psuti.conf.repository.TokenRepository;
 import ru.psuti.conf.service.ConfirmationService;
 import ru.psuti.conf.service.JwtService;
@@ -34,15 +37,20 @@ import java.util.Optional;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
+    private final PasswordEncoder passwordEncoder;
+
     private final AuthenticationManager authenticationManager;
     private final ConfirmationService confirmationService;
     private final TokenRepository tokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final JwtService jwtService;
+    private final Environment env;
+
+
 
     @PostMapping("/sign-in")
-    public AuthenticationSuccess signIn(@RequestBody @Valid SignIn request, HttpServletResponse response) throws IOException {
+    public AuthenticationSuccessDTO signIn(@RequestBody @Valid SignIn request, HttpServletResponse response) throws IOException {
         var user = userService
                 .userDetailsService()
                 .loadUserByUsername(request.getEmail());
@@ -79,12 +87,26 @@ public class AuthController {
 
         response.addCookie(cookie);
 
-        return new AuthenticationSuccess(accessToken);
+        return new AuthenticationSuccessDTO(accessToken);
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<String> signUp(@RequestBody @Valid SignUp request, HttpServletResponse response) throws IOException {
-        Optional<User> user = userService.createByEmail(request.toUser(passwordEncoder));
+    public ResponseEntity<String> signUp(@RequestBody @Valid SignUpDTO request, HttpServletResponse response) throws IOException {
+        Optional<User> user = userService.createByEmail(
+                User.builder()
+                        .email(request.getEmail())
+                        .password(passwordEncoder.encode(request.getPassword()))
+                        .preferredLocale(request.getPreferredLocale())
+                        .names(request.getNames().entrySet().stream().map(
+                                data -> UserLocalized.builder()
+                                        .locale(data.getKey())
+                                        .lastName(data.getValue().getLastName())
+                                        .firstName(data.getValue().getFirstName())
+                                        .middleName(data.getValue().getMiddleName())
+                                        .build()
+                        ).toList())
+                        .build()
+        );
 
         if (user.isEmpty()) {
             response.sendError(HttpServletResponse.SC_CONFLICT, "User email already in use.");
@@ -98,7 +120,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     @Transactional
-    public AuthenticationSuccess refreshToken(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response) throws IOException {
+    public AuthenticationSuccessDTO refreshToken(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response) throws IOException {
         String refreshToken = getRefreshToken(request.getCookies());
 
         if (ObjectUtils.isEmpty(refreshToken)) {
@@ -142,13 +164,14 @@ public class AuthController {
 
             Cookie cookie = new Cookie("refreshToken", newRefreshToken.getFirst());
             cookie.setHttpOnly(true);
-            // cookie.setSecure(true);
-            cookie.setPath("/api/auth/refresh");
+            if (!env.acceptsProfiles(Profiles.of("dev")))
+                cookie.setSecure(true);
+            cookie.setPath("/api/auth");
             cookie.setMaxAge(30 * 24 * 60 * 60);
 
             response.addCookie(cookie);
 
-            return new AuthenticationSuccess(accessToken);
+            return new AuthenticationSuccessDTO(accessToken);
         }
         return null;
     }
@@ -163,8 +186,9 @@ public class AuthController {
 
         var cookie = new Cookie("refreshToken", "");
         cookie.setHttpOnly(true);
-        // cookie.setSecure(true);
-        cookie.setPath("/api/auth/refresh");
+        if (!env.acceptsProfiles(Profiles.of("dev")))
+            cookie.setSecure(true);
+        cookie.setPath("/api/auth");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
 
