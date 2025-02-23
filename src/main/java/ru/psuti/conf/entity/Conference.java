@@ -85,6 +85,9 @@ public class Conference {
     @Column(name = "closing_date_for_applications")
     private ZonedDateTime closingDateForApplications;
 
+    @Column(name = "closing_date_for_registrations")
+    private ZonedDateTime closingDateForRegistrations;
+
     @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
     private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>();
 
