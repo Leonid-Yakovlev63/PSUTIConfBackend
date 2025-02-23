@@ -20,4 +20,11 @@ public class CompactConferencePageDTO {
         this.pageNameEn = conferencePage.getPageNameEn();
     }
 
+    public CompactConferencePageDTO(Long id, String path, String pageNameRu, String pageNameEn){
+        this.id = id;
+        this.path = path;
+        this.pageNameRu = pageNameRu;
+        this.pageNameEn = pageNameEn;
+    }
+
 }

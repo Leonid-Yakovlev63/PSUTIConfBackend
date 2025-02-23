@@ -33,9 +33,9 @@ public class FullConferenceDTO {
     ZonedDateTime closingDateForApplications;
     List<ConferenceSectionDTO> conferenceSections;
     List<ConferenceOrganizerDTO> conferenceOrganizers;
-    List<ConferencePageDTO> pages;
+    List<CompactConferencePageDTO> pages;
 
-    public FullConferenceDTO(Conference conference) {
+    public FullConferenceDTO(Conference conference, List<CompactConferencePageDTO> conferencePageDTOs) {
         this.id = conference.getId();
         this.slug = conference.getSlug();
         this.isEnabled = conference.getIsEnabled();
@@ -63,8 +63,7 @@ public class FullConferenceDTO {
                 .map(ConferenceOrganizerDTO::new)
                 .collect(Collectors.toList());
 
-        this.pages = conference.getConferencePages().stream()
-                .map(ConferencePageDTO::new)
-                .collect(Collectors.toList());
+        this.pages = conferencePageDTOs;
+
     }
 }

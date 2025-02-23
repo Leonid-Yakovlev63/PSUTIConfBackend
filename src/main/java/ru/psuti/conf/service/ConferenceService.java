@@ -3,8 +3,9 @@ package ru.psuti.conf.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.psuti.conf.dto.request.CreateConferenceDto;
-import ru.psuti.conf.dto.response.CompactConference;
+import ru.psuti.conf.dto.request.CreateConferenceDTO;
+import ru.psuti.conf.dto.response.CompactConferenceDTO;
+import ru.psuti.conf.dto.response.CompactConferencePageDTO;
 import ru.psuti.conf.entity.Conference;
 import ru.psuti.conf.entity.ConferencePage;
 import ru.psuti.conf.repository.ConferencePageRepository;
@@ -24,24 +25,24 @@ public class ConferenceService {
     @Autowired
     private ConferencePageRepository conferencePageRepository;
 
-    public List<CompactConference> getConferences() {
-        return conferenceRepository.findAll().stream().map(CompactConference::new).collect(Collectors.toList());
+    public List<CompactConferenceDTO> getConferences() {
+        return conferenceRepository.findAll().stream().map(CompactConferenceDTO::new).collect(Collectors.toList());
     }
 
     public Optional<Conference> getConferenceById(Long id) {
         return conferenceRepository.findById(id);
     }
 
-    public List<CompactConference> getConferencesByYear(Short year) {
-        return conferenceRepository.findActiveConferencesByYear(year).stream().map(CompactConference::new).collect(Collectors.toList());
+    public List<CompactConferenceDTO> getConferencesByYear(Short year) {
+        return conferenceRepository.findActiveConferencesByYear(year).stream().map(CompactConferenceDTO::new).collect(Collectors.toList());
     }
 
-    public List<CompactConference> getCurrentConferences() {
-        return conferenceRepository.findByEndDateGreaterThanEqualAndIsEnabledTrue(LocalDate.now()).stream().map(CompactConference::new).collect(Collectors.toList());
+    public List<CompactConferenceDTO> getCurrentConferences() {
+        return conferenceRepository.findByEndDateGreaterThanEqualAndIsEnabledTrue(LocalDate.now()).stream().map(CompactConferenceDTO::new).collect(Collectors.toList());
     }
 
-    public List<CompactConference> getNewConferences() {
-        return conferenceRepository.findInactiveConferences().stream().map(CompactConference::new).toList();
+    public List<CompactConferenceDTO> getNewConferences() {
+        return conferenceRepository.findInactiveConferences().stream().map(CompactConferenceDTO::new).toList();
     }
 
     public Optional<Conference> getConferenceBySlug(String slug) {
@@ -57,8 +58,12 @@ public class ConferenceService {
         return conferencePageRepository.getConferencePageByPathAndConference_Slug(path, slug);
     }
 
+    public List<CompactConferencePageDTO> getCompactConferencePagesDTO(Long id) {
+        return conferencePageRepository.getCompactConferencePagesDTO(id);
+    }
+
     @Transactional
-    public Optional<Conference> createConference(CreateConferenceDto createConferenceDto){
+    public Optional<Conference> createConference(CreateConferenceDTO createConferenceDto){
         if (conferenceRepository.existsBySlug(createConferenceDto.getSlug()))
             return Optional.empty();
         return Optional.of(conferenceRepository.save(

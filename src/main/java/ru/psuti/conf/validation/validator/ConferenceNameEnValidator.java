@@ -2,13 +2,13 @@ package ru.psuti.conf.validation.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ru.psuti.conf.dto.request.CreateConferenceDto;
+import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.validation.anotation.ConferenceNameEnRequiredIfEnglishEnabled;
 
-public class ConferenceNameEnValidator implements ConstraintValidator<ConferenceNameEnRequiredIfEnglishEnabled, CreateConferenceDto> {
+public class ConferenceNameEnValidator implements ConstraintValidator<ConferenceNameEnRequiredIfEnglishEnabled, CreateConferenceDTO> {
 
     @Override
-    public boolean isValid(CreateConferenceDto value, ConstraintValidatorContext context) {
+    public boolean isValid(CreateConferenceDTO value, ConstraintValidatorContext context) {
         if (value == null) {
             return true;
         }

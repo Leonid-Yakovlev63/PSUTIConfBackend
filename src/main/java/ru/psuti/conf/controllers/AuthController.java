@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.psuti.conf.dto.request.auth.SignIn;
+import ru.psuti.conf.dto.request.auth.SignInDTO;
 import ru.psuti.conf.dto.request.auth.SignUpDTO;
 import ru.psuti.conf.dto.response.auth.AuthenticationSuccessDTO;
 import ru.psuti.conf.entity.Token;
@@ -50,7 +50,7 @@ public class AuthController {
 
 
     @PostMapping("/sign-in")
-    public AuthenticationSuccessDTO signIn(@RequestBody @Valid SignIn request, HttpServletResponse response) throws IOException {
+    public AuthenticationSuccessDTO signIn(@RequestBody @Valid SignInDTO request, HttpServletResponse response) throws IOException {
         var user = userService
                 .userDetailsService()
                 .loadUserByUsername(request.getEmail());
