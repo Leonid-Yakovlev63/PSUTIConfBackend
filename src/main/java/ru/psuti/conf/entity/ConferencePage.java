@@ -1,15 +1,13 @@
 package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity(name = "conference_pages")
 public class ConferencePage {
 
@@ -31,6 +29,10 @@ public class ConferencePage {
 
     @Column(name = "html_content_en", columnDefinition="TEXT")
     private String htmlContentEn;
+
+    @Column(name = "is_enabled", nullable = false)
+    @Builder.Default
+    private Boolean isEnabled = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conference_id")

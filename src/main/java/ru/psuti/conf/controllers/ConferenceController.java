@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.psuti.conf.dto.request.CreateConferenceDto;
 import ru.psuti.conf.dto.response.CompactConference;
+import ru.psuti.conf.dto.response.ConferencePageDTO;
+import ru.psuti.conf.dto.response.ConferencePageLocalizedDTO;
 import ru.psuti.conf.dto.response.FullConferenceDto;
 import ru.psuti.conf.entity.Conference;
 import ru.psuti.conf.entity.*;
@@ -69,6 +71,55 @@ public class ConferenceController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+    }
+
+    @GetMapping("/slug/{slug}/{subPage}/{lang}")
+    public ResponseEntity<ConferencePageLocalizedDTO> getConferencePageByLang(
+            @PathVariable String slug,
+            @PathVariable String subPage,
+            @PathVariable Locale lang
+    ) {
+
+        Optional<ConferencePage> optionalConferencePage = conferenceService.getConferencePageBySlugAndPath(slug, subPage);
+        if (optionalConferencePage.isPresent()) {
+            ConferencePage conferencePage = optionalConferencePage.get();
+            if (lang.equals(Locale.RU)) {
+                return new ResponseEntity<>(
+                        ConferencePageLocalizedDTO.builder()
+                                .lang(lang.name())
+                                .path(conferencePage.getPath())
+                                .pageName(conferencePage.getPageNameRu())
+                                .htmlContent(conferencePage.getHtmlContentRu())
+                                .build(),
+                        HttpStatus.OK
+                );
+            }
+            if (lang.equals(Locale.EN)) {
+                return new ResponseEntity<>(
+                        ConferencePageLocalizedDTO.builder()
+                                .lang(lang.name())
+                                .path(conferencePage.getPath())
+                                .pageName(conferencePage.getPageNameEn())
+                                .htmlContent(conferencePage.getHtmlContentEn())
+                                .build(),
+                        HttpStatus.OK
+                );
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/slug/{slug}/{subPage}")
+    public ResponseEntity<ConferencePageDTO> getConferenceInfo(
+            @PathVariable String slug,
+            @PathVariable String subPage
+    ){
+        Optional<ConferencePage> optionalConferencePage = conferenceService.getConferencePageBySlugAndPath(slug, subPage);
+        if (optionalConferencePage.isPresent()) {
+            ConferencePageDTO conferencePageDTO = new ConferencePageDTO(optionalConferencePage.get());
+            return new ResponseEntity<>(conferencePageDTO, HttpStatus.OK);
+        }
+        return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/years")

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.psuti.conf.dto.request.CreateConferenceDto;
 import ru.psuti.conf.dto.response.CompactConference;
 import ru.psuti.conf.entity.Conference;
+import ru.psuti.conf.entity.ConferencePage;
 import ru.psuti.conf.repository.ConferencePageRepository;
 import ru.psuti.conf.repository.ConferenceRepository;
 
@@ -50,6 +51,10 @@ public class ConferenceService {
 
     public List<Short> getYears() {
         return conferenceRepository.findYears();
+    }
+
+    public Optional<ConferencePage> getConferencePageBySlugAndPath(String slug, String path) {
+        return conferencePageRepository.getConferencePageByPathAndConference_Slug(path, slug);
     }
 
     @Transactional
