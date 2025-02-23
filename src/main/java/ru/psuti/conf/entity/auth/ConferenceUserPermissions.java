@@ -11,7 +11,8 @@ import java.util.Arrays;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "conference_user_permissions")
+@Entity
+@Table(name = "conference_user_permissions")
 public class ConferenceUserPermissions {
 
     @Id

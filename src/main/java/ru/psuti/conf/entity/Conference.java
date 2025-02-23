@@ -16,7 +16,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "conferences")
+@Entity
+@Table(name = "conferences")
 public class Conference {
 
     @Id

@@ -8,7 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity(name = "conference_pages")
+@Entity
+@Table(name = "conference_pages")
 public class ConferencePage {
 
     @Id
