@@ -9,8 +9,10 @@ import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.*;
 import ru.psuti.conf.entity.Conference;
 import ru.psuti.conf.entity.*;
+import ru.psuti.conf.entity.auth.ConferenceUserPermissions;
 import ru.psuti.conf.entity.auth.PermissionFlags;
 import ru.psuti.conf.entity.auth.Role;
+import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.service.ConferenceService;
 import ru.psuti.conf.service.UserService;
 
@@ -152,6 +154,18 @@ public class ConferenceController {
     @GetMapping("/new")
     public List<CompactConferenceDTO> getNewConferences() {
         return conferenceService.getNewConferences();
+    }
+
+    private boolean hasPagePermission(Long id) {
+        Optional<User> optionalUser = UserService.getCurrentUser();
+        if(optionalUser.isPresent()){
+            if(optionalUser.get().getRole().equals(Role.ADMIN)){
+                return true;
+            }
+            Optional<ConferenceUserPermissions> permissions = optionalUser.get().getConferenceUserPermissions().stream().filter(p->p.getId().equals(id)).findAny();
+            return permissions.map(p->p.hasAnyPermission(PermissionFlags.ADMIN, PermissionFlags.READ_HIDDEN_PAGES)).orElse(false);
+        }
+        return false;
     }
 
     private boolean hasPermission(Conference conference){
