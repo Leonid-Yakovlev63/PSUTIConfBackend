@@ -1,4 +1,4 @@
-package ru.psuti.conf.entity;
+package ru.psuti.conf.entity.auth;
 
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

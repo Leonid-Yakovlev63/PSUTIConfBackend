@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.psuti.conf.entity.Role;
-import ru.psuti.conf.entity.User;
+import ru.psuti.conf.entity.auth.Role;
+import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.repository.EmailChangeCodeRepository;
 import ru.psuti.conf.repository.UserRepository;
 
@@ -28,7 +28,7 @@ public class UserService {
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getPrincipal)
-                .filter(principal -> !"anonymousUser".equals(principal))
+                .filter(principal -> principal instanceof User)
                 .map(User.class::cast);
     }
 
@@ -46,6 +46,8 @@ public class UserService {
         if (userRepository.existsByEmail(user.getUsername()))
             return Optional.empty();
 
+        user.getNames().forEach(userLocalized -> userLocalized.setUser(user));
+
         if (emailChangeCodeRepository.existsByNewEmail(user.getUsername()))
             return Optional.empty();
 
@@ -53,7 +55,7 @@ public class UserService {
     }
 
     public User getByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
+        return userRepository.findByEmailEager(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
     }
 

@@ -23,7 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
-import ru.psuti.conf.entity.Role;
+import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.service.UserService;
 
 import java.util.List;

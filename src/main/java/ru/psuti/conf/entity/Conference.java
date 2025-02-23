@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import ru.psuti.conf.entity.auth.ConferenceUserPermissions;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -95,15 +96,9 @@ public class Conference {
     )
     private List<ConferenceOrganizer> conferenceOrganizers = new ArrayList<ConferenceOrganizer>();
 
+    @OneToMany(mappedBy = "conference", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConferenceUserPermissions> conferenceUserPermissions = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.MERGE})
-    @JoinTable(
-            name = "conferences_admins",
-            joinColumns = @JoinColumn(name = "conference_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> admins = new ArrayList<User>();
-
-    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.MERGE, orphanRemoval = true)
     private List<ConferencePage> conferencePages = new ArrayList<ConferencePage>();
 }
