@@ -5,15 +5,13 @@ import lombok.Value;
 import ru.psuti.conf.entity.Conference;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * DTO for {@link ru.psuti.conf.entity.Conference}
  */
 @Value
 @AllArgsConstructor
-public class CompactConference {
+public class CompactConferenceDTO {
     Long id;
     String slug;
     Boolean isEnabled;
@@ -25,7 +23,7 @@ public class CompactConference {
     LocalDate startDate;
     LocalDate endDate;
 
-    public CompactConference(Conference conference) {
+    public CompactConferenceDTO(Conference conference) {
         this.id = conference.getId();
         this.slug = conference.getSlug();
         this.isEnabled = conference.getIsEnabled();

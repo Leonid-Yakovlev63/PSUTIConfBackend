@@ -6,7 +6,7 @@ import ru.psuti.conf.entity.ConferenceOrganizer;
 
 @Value
 @AllArgsConstructor
-public class ConferenceOrganizerDto {
+public class ConferenceOrganizerDTO {
 
     Long id;
     String organizerNameRu;
@@ -15,7 +15,7 @@ public class ConferenceOrganizerDto {
     String email;
     String phone;
 
-    public ConferenceOrganizerDto(ConferenceOrganizer organizer) {
+    public ConferenceOrganizerDTO(ConferenceOrganizer organizer) {
         this.id = organizer.getId();
         this.organizerNameRu = organizer.getOrganizerNameRu();
         this.organizerNameEn = organizer.getOrganizerNameEn();

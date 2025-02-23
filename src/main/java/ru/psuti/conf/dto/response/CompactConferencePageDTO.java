@@ -7,13 +7,13 @@ import ru.psuti.conf.entity.ConferencePage;
  * DTO for {@link ru.psuti.conf.entity.ConferencePage}
  */
 @Value
-public class CompactConferencePage {
+public class CompactConferencePageDTO {
     Long id;
     String path;
     String pageNameRu;
     String pageNameEn;
 
-    public CompactConferencePage(ConferencePage conferencePage) {
+    public CompactConferencePageDTO(ConferencePage conferencePage) {
         this.id = conferencePage.getId();
         this.path = conferencePage.getPath();
         this.pageNameRu = conferencePage.getPageNameRu();

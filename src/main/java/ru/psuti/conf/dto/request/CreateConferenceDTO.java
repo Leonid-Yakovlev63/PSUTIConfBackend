@@ -14,7 +14,7 @@ import java.time.LocalDate;
  */
 @Value
 @ConferenceNameEnRequiredIfEnglishEnabled
-public class CreateConferenceDto {
+public class CreateConferenceDTO {
 
     @NotBlank
     @Length(max = 255)

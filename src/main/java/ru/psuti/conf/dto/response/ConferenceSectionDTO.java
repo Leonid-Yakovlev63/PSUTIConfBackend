@@ -6,14 +6,14 @@ import ru.psuti.conf.entity.ConferenceSection;
 
 @Value
 @AllArgsConstructor
-public class ConferenceSectionDto {
+public class ConferenceSectionDTO {
 
     Long id;
     String sectionName;
     String description;
     String place;
 
-    public ConferenceSectionDto(ConferenceSection section) {
+    public ConferenceSectionDTO(ConferenceSection section) {
         this.id = section.getId();
         this.sectionName = section.getSectionName();
         this.description = section.getDescription();
