@@ -18,7 +18,7 @@ public class Token {
     @Column(nullable = false, length = 512)
     private String token;
 
-    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = User.class, cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

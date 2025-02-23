@@ -81,8 +81,9 @@ public class AuthController {
 
         Cookie cookie = new Cookie("refreshToken", refreshToken.getFirst());
         cookie.setHttpOnly(true);
-        // cookie.setSecure(true);
-        cookie.setPath("/api/auth/refresh");
+        if (!env.acceptsProfiles(Profiles.of("dev")))
+            cookie.setSecure(true);
+        cookie.setPath("/api/auth");
         cookie.setMaxAge(30 * 24 * 60 * 60);
 
         response.addCookie(cookie);
@@ -118,8 +119,8 @@ public class AuthController {
         return ResponseEntity.status(HttpServletResponse.SC_CREATED).body("Confirm email.");
     }
 
-    @PostMapping("/refresh")
     @Transactional
+    @PostMapping("/refresh")
     public AuthenticationSuccessDTO refreshToken(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response) throws IOException {
         String refreshToken = getRefreshToken(request.getCookies());
 
@@ -195,7 +196,7 @@ public class AuthController {
         return true;
     }
 
-    private String getRefreshToken(Cookie[] cookies) {
+    private static String getRefreshToken(Cookie[] cookies) {
         if (ObjectUtils.isEmpty(cookies)) {
             return null;
         }
