@@ -24,7 +24,6 @@ public class CompactConference {
     String statusEn;
     LocalDate startDate;
     LocalDate endDate;
-    List<CompactConferencePage> compactConferencePages;
 
     public CompactConference(Conference conference) {
         this.id = conference.getId();
@@ -37,9 +36,6 @@ public class CompactConference {
         this.statusEn = conference.getStatusEn();
         this.startDate = conference.getStartDate();
         this.endDate = conference.getEndDate();
-        this.compactConferencePages = conference.getConferencePages().stream()
-                .map(CompactConferencePage::new)
-                .collect(Collectors.toList());
     }
 
 }
