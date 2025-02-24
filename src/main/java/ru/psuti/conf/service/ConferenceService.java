@@ -1,11 +1,13 @@
 package ru.psuti.conf.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.CompactConferenceDTO;
 import ru.psuti.conf.dto.response.CompactConferencePageDTO;
+import ru.psuti.conf.dto.response.ConferencePageDTO;
 import ru.psuti.conf.entity.Conference;
 import ru.psuti.conf.entity.ConferencePage;
 import ru.psuti.conf.repository.ConferencePageRepository;
@@ -13,6 +15,7 @@ import ru.psuti.conf.repository.ConferenceRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,6 +63,39 @@ public class ConferenceService {
 
     public List<CompactConferencePageDTO> getCompactConferencePagesDTO(Long id) {
         return conferencePageRepository.getCompactConferencePagesDTO(id);
+    }
+
+    public List<ConferencePage> getConferencePagesByConferenceSlug(String slug) {
+        return conferencePageRepository.findAllByConferenceSlug(slug);
+    }
+
+    public ConferencePage saveConferencePage(ConferencePageDTO conferencePageDTO, String slug) {
+
+        Optional<Conference> optionalConference = this.getConferenceBySlug(slug);
+
+        if (optionalConference.isPresent()) {
+            Conference conference = optionalConference.get();
+
+            Optional<ConferencePage> existingPage = conferencePageRepository
+                    .getConferencePageByPathAndConference_Slug(conferencePageDTO.getPath(), slug);
+
+            if (existingPage.isPresent()) {
+                throw new IllegalArgumentException("Page with this path already exists for the conference.");
+            }
+
+            ConferencePage conferencePage = ConferencePage.builder()
+                    .path(conferencePageDTO.getPath())
+                    .pageNameRu(conferencePageDTO.getPageNameRu())
+                    .pageNameEn(conferencePageDTO.getPageNameEn())
+                    .htmlContentRu(conferencePageDTO.getHtmlContentRu())
+                    .htmlContentEn(conferencePageDTO.getHtmlContentEn())
+                    .isEnabled(false)
+                    .conference(conference)
+                    .build();
+
+            return conferencePageRepository.save(conferencePage);
+        }
+        throw new NoSuchElementException("Conference not found with slug: " + slug);
     }
 
     @Transactional

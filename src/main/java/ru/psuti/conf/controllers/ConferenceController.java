@@ -17,6 +17,7 @@ import ru.psuti.conf.service.ConferenceService;
 import ru.psuti.conf.service.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -128,6 +129,22 @@ public class ConferenceController {
         }
         return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @PostMapping("/slug/{slug}/subPage")
+    public ResponseEntity<ConferencePage> createConferencePage(
+            @RequestBody ConferencePageDTO conferencePageDTO,
+            @PathVariable String slug
+        ){
+            try {
+                ConferencePage conferencePage = conferenceService.saveConferencePage(conferencePageDTO, slug);
+                return new ResponseEntity<>(conferencePage, HttpStatus.CREATED);
+            } catch (NoSuchElementException e) {
+                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
 
     @GetMapping("/years")
     public List<Short> getYears() {
