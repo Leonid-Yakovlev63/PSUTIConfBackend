@@ -98,6 +98,13 @@ public class ConferenceService {
         throw new NoSuchElementException("Conference not found with slug: " + slug);
     }
 
+    public void activateConferencePage(Long pageId) {
+        int updatedRows = conferencePageRepository.activateConferencePage(pageId);
+        if (updatedRows == 0) {
+            throw new NoSuchElementException("Conference page not found with id: " + pageId);
+        }
+    }
+
     @Transactional
     public Optional<Conference> createConference(CreateConferenceDTO createConferenceDto){
         if (conferenceRepository.existsBySlug(createConferenceDto.getSlug()))

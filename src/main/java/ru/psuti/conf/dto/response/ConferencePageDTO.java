@@ -9,7 +9,6 @@ import ru.psuti.conf.entity.ConferencePage;
 
 @Value
 @Builder
-@AllArgsConstructor
 public class ConferencePageDTO {
 
     public String path;

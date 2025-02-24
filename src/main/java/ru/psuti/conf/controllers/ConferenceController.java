@@ -145,6 +145,12 @@ public class ConferenceController {
             }
         }
 
+    @PatchMapping("/slug/{slug}/subPage/{pageId}/activate")
+    public ResponseEntity<String> activateConferencePage(@PathVariable Long pageId) {
+        conferenceService.activateConferencePage(pageId);
+        return ResponseEntity.ok("Conference page activated successfully");
+    }
+
 
     @GetMapping("/years")
     public List<Short> getYears() {
