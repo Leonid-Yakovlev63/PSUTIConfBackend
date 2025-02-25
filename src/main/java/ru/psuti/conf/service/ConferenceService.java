@@ -69,6 +69,7 @@ public class ConferenceService {
         return conferencePageRepository.findAllByConferenceSlug(slug);
     }
 
+    @Transactional
     public ConferencePage saveConferencePage(ConferencePageDTO conferencePageDTO, String slug) {
 
         Optional<Conference> optionalConference = this.getConferenceBySlug(slug);
@@ -98,11 +99,29 @@ public class ConferenceService {
         throw new NoSuchElementException("Conference not found with slug: " + slug);
     }
 
+    @Transactional
     public void activateConferencePage(Long pageId) {
         int updatedRows = conferencePageRepository.activateConferencePage(pageId);
         if (updatedRows == 0) {
             throw new NoSuchElementException("Conference page not found with id: " + pageId);
         }
+    }
+
+    @Transactional
+    public ConferencePage updateConferencePage(ConferencePageDTO conferencePageDTO, String slug, String path) {
+        Optional<ConferencePage> optionalConferencePage = conferencePageRepository.getConferencePageByPathAndConference_Slug(path, slug);
+        if (optionalConferencePage.isPresent()){
+
+            ConferencePage conferencePage = optionalConferencePage.get();
+            conferencePage.setPath(conferencePageDTO.getPath());
+            conferencePage.setPageNameRu(conferencePageDTO.getPageNameRu());
+            conferencePage.setPageNameEn(conferencePageDTO.getPageNameEn());
+            conferencePage.setHtmlContentRu(conferencePageDTO.getHtmlContentRu());
+            conferencePage.setHtmlContentEn(conferencePageDTO.getHtmlContentEn());
+
+            return conferencePageRepository.save(conferencePage);
+        }
+        throw new NoSuchElementException("Conference page not found");
     }
 
     @Transactional

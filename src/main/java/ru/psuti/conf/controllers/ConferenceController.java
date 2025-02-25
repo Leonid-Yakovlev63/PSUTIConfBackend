@@ -134,16 +134,41 @@ public class ConferenceController {
     public ResponseEntity<ConferencePage> createConferencePage(
             @RequestBody ConferencePageDTO conferencePageDTO,
             @PathVariable String slug
-        ){
-            try {
-                ConferencePage conferencePage = conferenceService.saveConferencePage(conferencePageDTO, slug);
-                return new ResponseEntity<>(conferencePage, HttpStatus.CREATED);
-            } catch (NoSuchElementException e) {
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+    ){
+        try {
+            ConferencePage conferencePage = conferenceService.saveConferencePage(conferencePageDTO, slug);
+            return new ResponseEntity<>(conferencePage, HttpStatus.CREATED);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PutMapping("/slug/{slug}/subPage/{path}")
+    public ResponseEntity<ConferencePageDTO> updateConferencePage(
+            @PathVariable String slug,
+            @PathVariable String path,
+            @RequestBody ConferencePageDTO conferencePageDTO
+    ) {
+
+        try {
+            ConferencePage conferencePage = conferenceService.updateConferencePage(conferencePageDTO, slug, path);
+            ConferencePageDTO returningConferencePageDTO = ConferencePageDTO.builder()
+                    .path(conferencePage.getPath())
+                    .pageNameRu(conferencePage.getPageNameRu())
+                    .pageNameEn(conferencePage.getPageNameEn())
+                    .htmlContentRu(conferencePage.getHtmlContentRu())
+                    .htmlContentEn(conferencePage.getHtmlContentEn())
+                    .build();
+            return new ResponseEntity<>(returningConferencePageDTO, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 
     @PatchMapping("/slug/{slug}/subPage/{pageId}/activate")
     public ResponseEntity<String> activateConferencePage(@PathVariable Long pageId) {
