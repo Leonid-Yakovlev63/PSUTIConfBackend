@@ -56,7 +56,7 @@ public class UserService {
 
     public User getByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmailEager(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new UsernameNotFoundException("Bad credentials"));
     }
 
     public UserDetailsService userDetailsService() {

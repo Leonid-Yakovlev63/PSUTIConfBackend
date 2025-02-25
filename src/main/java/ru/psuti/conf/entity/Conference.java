@@ -27,11 +27,13 @@ public class Conference {
     @Column(unique = true, nullable = false)
     private String slug;
 
+    @Builder.Default
     @Column(name = "is_enabled", nullable = false)
-    private Boolean isEnabled;
+    private Boolean isEnabled = false;
 
+    @Builder.Default
     @Column(name = "is_enabled_for_registration", nullable = false)
-    private Boolean isEnabledForRegistration;
+    private Boolean isEnabledForRegistration = false;
 
     @Column(name = "is_english_enabled", nullable = false)
     private Boolean isEnglishEnabled;

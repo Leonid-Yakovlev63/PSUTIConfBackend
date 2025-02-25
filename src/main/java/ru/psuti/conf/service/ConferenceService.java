@@ -129,7 +129,16 @@ public class ConferenceService {
         if (conferenceRepository.existsBySlug(createConferenceDto.getSlug()))
             return Optional.empty();
         return Optional.of(conferenceRepository.save(
-                createConferenceDto.toConference()
+                Conference.builder()
+                        .slug(createConferenceDto.getSlug())
+                        .isEnglishEnabled(createConferenceDto.getIsEnglishEnabled())
+                        .conferenceNameRu(createConferenceDto.getConferenceNameRu())
+                        .conferenceNameEn(createConferenceDto.getConferenceNameEn())
+                        .statusRu(createConferenceDto.getStatusRu())
+                        .statusEn(createConferenceDto.getStatusEn())
+                        .startDate(createConferenceDto.getStartDate())
+                        .endDate(createConferenceDto.getEndDate())
+                        .build()
         ));
     }
 }
