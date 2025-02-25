@@ -1,5 +1,7 @@
 package ru.psuti.conf.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
@@ -7,7 +9,6 @@ import ru.psuti.conf.entity.ConferencePage;
 
 @Value
 @Builder
-@AllArgsConstructor
 public class ConferencePageDTO {
 
     public String path;
@@ -20,7 +21,21 @@ public class ConferencePageDTO {
     
     public String htmlContentEn;
 
-    public Boolean isEnabled = false;
+
+    @JsonCreator
+    public ConferencePageDTO(
+            @JsonProperty("path") String path,
+            @JsonProperty("pageNameRu") String pageNameRu,
+            @JsonProperty("pageNameEn") String pageNameEn,
+            @JsonProperty("htmlContentRu") String htmlContentRu,
+            @JsonProperty("htmlContentEn") String htmlContentEn
+    ) {
+        this.path = path;
+        this.pageNameRu = pageNameRu;
+        this.pageNameEn = pageNameEn;
+        this.htmlContentRu = htmlContentRu;
+        this.htmlContentEn = htmlContentEn;
+    }
 
     public ConferencePageDTO(ConferencePage conferencePage){
         this.path = conferencePage.getPath();
