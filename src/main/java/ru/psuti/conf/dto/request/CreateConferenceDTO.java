@@ -37,18 +37,4 @@ public class CreateConferenceDTO {
     LocalDate startDate;
 
     LocalDate endDate;
-
-    public Conference toConference() {
-        return Conference.builder()
-                .slug(slug)
-                .isEnglishEnabled(isEnglishEnabled)
-                .conferenceNameRu(conferenceNameRu)
-                .conferenceNameEn(conferenceNameEn)
-                .statusRu(statusRu)
-                .statusEn(statusEn)
-                .startDate(startDate)
-                .endDate(endDate)
-                .isEnabled(false)
-                .build();
-    }
 }
