@@ -91,10 +91,10 @@ public class Conference {
     @Column(name = "closing_date_for_registrations")
     private ZonedDateTime closingDateForRegistrations;
 
-    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>();
 
-    @ManyToMany(cascade = { CascadeType.MERGE })
+    @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
     @JoinTable(
             name = "conferences_organizers",
             joinColumns = @JoinColumn(name = "conference_id"),
@@ -102,7 +102,7 @@ public class Conference {
     )
     private List<ConferenceOrganizer> conferenceOrganizers = new ArrayList<ConferenceOrganizer>();
 
-    @OneToMany(mappedBy = "conference", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConferenceUserPermissions> conferenceUserPermissions = new ArrayList<>();
 
     @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.MERGE, orphanRemoval = true)
