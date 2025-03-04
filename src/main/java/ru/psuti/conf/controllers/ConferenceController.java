@@ -9,6 +9,7 @@ import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.*;
 import ru.psuti.conf.entity.Conference;
 import ru.psuti.conf.entity.*;
+import ru.psuti.conf.entity.Locale;
 import ru.psuti.conf.entity.auth.ConferenceUserPermissions;
 import ru.psuti.conf.entity.auth.PermissionFlags;
 import ru.psuti.conf.entity.auth.Role;
@@ -16,10 +17,7 @@ import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.service.ConferenceService;
 import ru.psuti.conf.service.UserService;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/conferences")
@@ -170,6 +168,30 @@ public class ConferenceController {
 
     }
 
+    /*
+    * Метод обновляющий список страниц конференции,
+    * принимает список страниц, удаляет из БД те страницы, которых нет в полученном списке,
+    * обновляет страницы, в которых есть изменения
+    * */
+    @PatchMapping("/slug/{slug}/subPages")
+    public ResponseEntity<String> updateConferencePages(
+            @PathVariable String slug,
+            @RequestBody List<ConferencePageDTO> conferencePageDTOs
+    ) {
+        Set<Integer> indexes = new HashSet<>();
+        for (ConferencePageDTO dto : conferencePageDTOs) {
+            if (indexes.contains(dto.getPageIndex())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Conference page index must be unique");
+            }
+            indexes.add(dto.getPageIndex());
+        }
+        try {
+            conferenceService.updateConferencePages(slug, conferencePageDTOs);
+            return ResponseEntity.ok("Conference pages updated successfully");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Conference not found");
+        }
+    }
     @PatchMapping("/slug/{slug}/subPage/{pageId}/activate")
     public ResponseEntity<String> activateConferencePage(@PathVariable Long pageId) {
         conferenceService.activateConferencePage(pageId);

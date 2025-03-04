@@ -16,6 +16,9 @@ public class ConferencePage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "page_index")
+    private Integer pageIndex;
+
     @Column(name = "path", nullable = false)
     private String path;
 

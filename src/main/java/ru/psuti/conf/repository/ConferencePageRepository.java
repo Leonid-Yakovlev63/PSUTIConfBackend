@@ -16,7 +16,9 @@ import java.util.Optional;
 public interface ConferencePageRepository extends JpaRepository<ConferencePage, Long> {
     public Optional<ConferencePage> getConferencePageByPathAndConference_Slug(String path, String slug);
 
-    @Query("SELECT new ru.psuti.conf.dto.response.CompactConferencePageDTO(c.id, c.path, c.pageNameRu, c.pageNameEn) FROM ConferencePage c WHERE c.conference.id = :id")
+    public List<ConferencePage> getConferencePagesByConference_Slug(String slug);
+
+    @Query("SELECT new ru.psuti.conf.dto.response.CompactConferencePageDTO(c.id, c.pageIndex, c.path, c.pageNameRu, c.pageNameEn) FROM ConferencePage c WHERE c.conference.id = :id")
     public List<CompactConferencePageDTO> getCompactConferencePagesDTO(Long id);
 
     @Query("SELECT cp FROM ConferencePage cp WHERE cp.conference.slug = :slug")

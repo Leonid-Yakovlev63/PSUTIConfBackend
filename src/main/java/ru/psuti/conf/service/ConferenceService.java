@@ -1,7 +1,6 @@
 package ru.psuti.conf.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
@@ -14,9 +13,7 @@ import ru.psuti.conf.repository.ConferencePageRepository;
 import ru.psuti.conf.repository.ConferenceRepository;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -98,7 +95,7 @@ public class ConferenceService {
         }
         throw new NoSuchElementException("Conference not found with slug: " + slug);
     }
-
+    
     @Transactional
     public void activateConferencePage(Long pageId) {
         int updatedRows = conferencePageRepository.activateConferencePage(pageId);
@@ -141,4 +138,57 @@ public class ConferenceService {
                         .build()
         ));
     }
+
+    @Transactional
+    public void updateConferencePages(String slug, List<ConferencePageDTO> conferencePageDTOs) {
+        Optional<Conference> optionalConference = conferenceRepository.findConferenceBySlug(slug);
+        if (optionalConference.isEmpty()) {
+            throw new NoSuchElementException("Conference not found");
+        }
+
+        Conference conference = optionalConference.get();
+        List<ConferencePage> conferencePages = conference.getConferencePages();
+
+        for (ConferencePageDTO pageDTO : conferencePageDTOs) {
+            Optional<ConferencePage> existingPageOpt = conferencePages.stream()
+                    .filter(page -> page.getPath().equals(pageDTO.getPath()))
+                    .findFirst();
+
+            if (existingPageOpt.isPresent()) {
+
+                ConferencePage existingPage = existingPageOpt.get();
+
+                existingPage.setPageNameRu(pageDTO.getPageNameRu());
+                existingPage.setPageNameEn(pageDTO.getPageNameEn());
+                existingPage.setPageIndex(pageDTO.getPageIndex());
+                existingPage.setIsEnabled(true);
+
+                conferencePageRepository.save(existingPage);
+            } else {
+                ConferencePage newPage = ConferencePage.builder()
+                        .path(pageDTO.getPath())
+                        .pageNameRu(pageDTO.getPageNameRu())
+                        .pageNameEn(pageDTO.getPageNameEn())
+                        .pageIndex(pageDTO.getPageIndex())
+                        .isEnabled(true)
+                        .conference(conference)
+                        .build();
+
+                conferencePageRepository.save(newPage);
+            }
+        }
+
+        List<String> pathsFromRequest = conferencePageDTOs.stream()
+                .map(ConferencePageDTO::getPath)
+                .collect(Collectors.toList());
+
+        List<ConferencePage> pagesToDelete = conferencePages.stream()
+                .filter(page -> !pathsFromRequest.contains(page.getPath()))
+                .collect(Collectors.toList());
+
+        for (ConferencePage page : pagesToDelete) {
+            conferencePageRepository.delete(page);
+        }
+    }
+
 }
