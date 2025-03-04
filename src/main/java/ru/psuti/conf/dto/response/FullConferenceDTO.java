@@ -31,6 +31,7 @@ public class FullConferenceDTO {
     String email;
     String phone;
     ZonedDateTime closingDateForApplications;
+    ZonedDateTime closingDateForRegistrations;
     List<ConferenceSectionDTO> conferenceSections;
     List<ConferenceOrganizerDTO> conferenceOrganizers;
     List<CompactConferencePageDTO> pages;
@@ -54,6 +55,7 @@ public class FullConferenceDTO {
         this.email = conference.getEmail();
         this.phone = conference.getPhone();
         this.closingDateForApplications = conference.getClosingDateForApplications();
+        this.closingDateForRegistrations = conference.getClosingDateForRegistrations();
 
         this.conferenceSections = conference.getConferenceSections().stream()
                 .map(ConferenceSectionDTO::new)
