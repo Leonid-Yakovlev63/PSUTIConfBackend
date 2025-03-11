@@ -110,7 +110,6 @@ public class ConferenceService {
         if (optionalConferencePage.isPresent()){
 
             ConferencePage conferencePage = optionalConferencePage.get();
-            conferencePage.setPath(conferencePageDTO.getPath());
             conferencePage.setIsEnabled(conferencePageDTO.getIsEnabled());
             conferencePage.setHtmlContentRu(conferencePageDTO.getHtmlContentRu());
             conferencePage.setHtmlContentEn(conferencePageDTO.getHtmlContentEn());
