@@ -111,8 +111,7 @@ public class ConferenceService {
 
             ConferencePage conferencePage = optionalConferencePage.get();
             conferencePage.setPath(conferencePageDTO.getPath());
-            conferencePage.setPageNameRu(conferencePageDTO.getPageNameRu());
-            conferencePage.setPageNameEn(conferencePageDTO.getPageNameEn());
+            conferencePage.setIsEnabled(conferencePageDTO.getIsEnabled());
             conferencePage.setHtmlContentRu(conferencePageDTO.getHtmlContentRu());
             conferencePage.setHtmlContentEn(conferencePageDTO.getHtmlContentEn());
 

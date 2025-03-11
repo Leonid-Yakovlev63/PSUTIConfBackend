@@ -18,7 +18,7 @@ public interface ConferencePageRepository extends JpaRepository<ConferencePage, 
 
     public List<ConferencePage> getConferencePagesByConference_Slug(String slug);
 
-    @Query("SELECT new ru.psuti.conf.dto.response.CompactConferencePageDTO(c.id, c.pageIndex, c.path, c.pageNameRu, c.pageNameEn) FROM ConferencePage c WHERE c.conference.id = :id")
+    @Query("SELECT new ru.psuti.conf.dto.response.CompactConferencePageDTO(c.id, c.pageIndex, c.isEnabled, c.path, c.pageNameRu, c.pageNameEn) FROM ConferencePage c WHERE c.conference.id = :id")
     public List<CompactConferencePageDTO> getCompactConferencePagesDTO(Long id);
 
     @Query("SELECT cp FROM ConferencePage cp WHERE cp.conference.slug = :slug")
