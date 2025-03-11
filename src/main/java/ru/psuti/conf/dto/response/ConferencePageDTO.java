@@ -12,6 +12,8 @@ import ru.psuti.conf.entity.ConferencePage;
 @Builder
 public class ConferencePageDTO {
 
+    public Long id;
+
     public String path;
 
     public Integer pageIndex;
@@ -29,6 +31,7 @@ public class ConferencePageDTO {
 
     @JsonCreator
     public ConferencePageDTO(
+            @JsonProperty("id") Long id,
             @JsonProperty("path") String path,
             @JsonProperty("pageIndex") Integer pageIndex,
             @JsonProperty("isEnabled") Boolean isEnabled,
@@ -37,6 +40,7 @@ public class ConferencePageDTO {
             @JsonProperty("htmlContentRu") String htmlContentRu,
             @JsonProperty("htmlContentEn") String htmlContentEn
     ) {
+        this.id = id;
         this.path = path;
         this.pageIndex = pageIndex;
         this.isEnabled = isEnabled;
@@ -47,6 +51,7 @@ public class ConferencePageDTO {
     }
 
     public ConferencePageDTO(ConferencePage conferencePage){
+        this.id = conferencePage.getId();
         this.path = conferencePage.getPath();
         this.pageIndex = conferencePage.getPageIndex();
         this.isEnabled = conferencePage.getIsEnabled();

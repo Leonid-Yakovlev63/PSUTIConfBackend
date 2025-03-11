@@ -137,6 +137,7 @@ public class ConferenceService {
         ));
     }
 
+    // +
     @Transactional
     public void updateConferencePages(String slug, List<ConferencePageDTO> conferencePageDTOs) {
         Optional<Conference> optionalConference = conferenceRepository.findConferenceBySlug(slug);
@@ -149,17 +150,17 @@ public class ConferenceService {
 
         for (ConferencePageDTO pageDTO : conferencePageDTOs) {
             Optional<ConferencePage> existingPageOpt = conferencePages.stream()
-                    .filter(page -> page.getPath().equals(pageDTO.getPath()))
+                    .filter(page -> pageDTO.getId() != null && page.getId().equals(pageDTO.getId()))
                     .findFirst();
 
             if (existingPageOpt.isPresent()) {
 
                 ConferencePage existingPage = existingPageOpt.get();
 
+                existingPage.setPath(pageDTO.getPath());
                 existingPage.setPageNameRu(pageDTO.getPageNameRu());
                 existingPage.setPageNameEn(pageDTO.getPageNameEn());
                 existingPage.setPageIndex(pageDTO.getPageIndex());
-                existingPage.setIsEnabled(true);
 
                 conferencePageRepository.save(existingPage);
             } else {
@@ -168,7 +169,7 @@ public class ConferenceService {
                         .pageNameRu(pageDTO.getPageNameRu())
                         .pageNameEn(pageDTO.getPageNameEn())
                         .pageIndex(pageDTO.getPageIndex())
-                        .isEnabled(true)
+                        .isEnabled(false)
                         .conference(conference)
                         .build();
 
@@ -176,17 +177,16 @@ public class ConferenceService {
             }
         }
 
-        List<String> pathsFromRequest = conferencePageDTOs.stream()
-                .map(ConferencePageDTO::getPath)
-                .collect(Collectors.toList());
+        List<Long> idsFromRequest = conferencePageDTOs.stream()
+                .map(ConferencePageDTO::getId)
+                .toList();
 
         List<ConferencePage> pagesToDelete = conferencePages.stream()
-                .filter(page -> !pathsFromRequest.contains(page.getPath()))
-                .collect(Collectors.toList());
+                .filter(page -> !idsFromRequest.contains(page.getId()))
+                .toList();
 
         for (ConferencePage page : pagesToDelete) {
             conferencePageRepository.delete(page);
         }
     }
-
 }
