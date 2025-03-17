@@ -18,7 +18,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -46,22 +48,24 @@ public class AppInitializer {
                     ? Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes)
                     : adminPassword;
             log.warn("Создан пользователь {} с паролем: {}", adminEmail, password);
-            userRepository.save(
-                    User.builder()
-                            .email(adminEmail)
-                            .password(passwordEncoder.encode(password))
-                            .emailVerified(true)
-                            .preferredLocale(Locale.RU)
-                            .names(List.of(
-                                    UserLocalized.builder()
-                                            .locale(Locale.RU)
-                                            .firstName("admin")
-                                            .lastName("admin")
-                                            .build()
-                            ))
-                            .role(Role.ADMIN)
-                            .build()
-            );
+            User user = User.builder()
+                    .email(adminEmail)
+                    .password(passwordEncoder.encode(password))
+                    .emailVerified(true)
+                    .preferredLocale(Locale.RU)
+                    .names(Collections.singletonList(
+                            UserLocalized.builder()
+                                    .locale(Locale.RU)
+                                    .firstName("admin")
+                                    .lastName("admin")
+                                    .build()
+                    ))
+                    .role(Role.ADMIN)
+                    .build();
+
+            user.getNames().forEach(userLocalized -> userLocalized.setUser(user));
+
+            userRepository.save(user);
         }
 
         try {
