@@ -31,6 +31,7 @@ import ru.psuti.conf.service.UserService;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -91,6 +92,7 @@ public class AuthController {
         return new AuthenticationSuccessDTO(accessToken);
     }
 
+    @Transactional
     @PostMapping("/sign-up")
     public ResponseEntity<String> signUp(@RequestBody @Valid SignUpDTO request, HttpServletResponse response) throws IOException {
         Optional<User> user = userService.createByEmail(
@@ -105,7 +107,7 @@ public class AuthController {
                                         .firstName(data.getValue().getFirstName())
                                         .middleName(data.getValue().getMiddleName())
                                         .build()
-                        ).toList())
+                        ).collect(Collectors.toList()))
                         .build()
         );
 

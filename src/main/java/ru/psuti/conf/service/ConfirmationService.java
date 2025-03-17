@@ -71,7 +71,7 @@ public class ConfirmationService {
         );
 
         String text = "Для подтверждения перейдите по ссылке: "
-                + siteDomain + "/confirm-email/code" + "?type=new&code=" + code + "&exp=" + exp;
+                + siteDomain + "/auth/confirm-email/code" + "?type=new&code=" + code + "&exp=" + exp;
 
         emailService.sendEmail(user.getEmail(), "Подтверждение адреса электронной почты", text);
     }

@@ -8,6 +8,7 @@ import ru.psuti.conf.entity.auth.UserLocalized;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
  */
 @Value
 public class CompactUserDTO {
-    Long id;
+    UUID id;
 
     String email;
 
