@@ -1,4 +1,4 @@
-package ru.psuti.conf.dto.response;
+package ru.psuti.conf.dto.response.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class AuthenticationSuccess {
+public class AuthenticationSuccessDTO {
     private String accessToken;
 }

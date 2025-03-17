@@ -1,38 +1,30 @@
-package ru.psuti.conf.entity;
+package ru.psuti.conf.entity.confirms;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.psuti.conf.entity.auth.User;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "psuti_account_binding_code")
+@Table(name = "email_change_code")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PsutiAccountBindingCode {
+public class EmailChangeCode {
 
     @Id
     @Column(nullable = false, unique = true, length = 64)
     private String code;
 
+    @Column(name = "new_email", nullable = false)
+    private String newEmail;
+
     @ManyToOne(targetEntity = User.class, cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @Column(name = "psuti_username", nullable = false)
-    private String psutiUsername;
-
-    @Column(name = "firstname_ru", length = 50, nullable = false)
-    private String firstnameRu;
-
-    @Column(name = "surname_ru", length = 100, nullable = false)
-    private String surnameRu;
-
-    @Column(name = "lastname_ru", length = 50)
-    private String lastnameRu;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

@@ -1,13 +1,16 @@
-package ru.psuti.conf.entity;
+package ru.psuti.conf.entity.auth;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.psuti.conf.entity.Locale;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -18,8 +21,8 @@ import java.util.Collection;
 @AllArgsConstructor
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -27,9 +30,15 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Boolean emailVerified;
 
+    @Builder.Default
     @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    private Role role;
+    private Role role = Role.USER;
+
+    @Builder.Default
+    @Column(nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    private Locale preferredLocale = Locale.EN;
 
     @Column(name = "psuti_username")
     private String psutiUsername;
@@ -37,39 +46,27 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "firstname_ru", length = 50, nullable = false)
-    private String firstnameRu;
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserLocalized> names;
 
-    @Column(name = "firstname_en", length = 50)
-    private String firstnameEn;
-
-    @Column(name = "lastname_ru", length = 100, nullable = false)
-    private String lastnameRu;
-
-    @Column(name = "lastname_en", length = 100)
-    private String lastnameEn;
-
-    @Column(name = "middlename_ru", length = 50)
-    private String middlenameRu;
-
-    @Column(name = "middlename_en", length = 50)
-    private String middlenameEn;
-
-    @Column(name = "country", length = 50)
+    @Column(name = "country", length = 300)
     private String country;
 
-    @Column(name = "city", length = 50)
+    @Column(name = "city", length = 300)
     private String city;
 
-    @Column(name = "organization")
+    @Column(name = "organization", length = 900)
     private String organization;
 
-    @Column(name = "organization_address")
+    @Column(name = "organization_address", length = 450)
     private String organizationAddress;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.MERGE, orphanRemoval = true)
+    private List<ConferenceUserPermissions> conferenceUserPermissions;
 
     @Override
     public String getUsername() {

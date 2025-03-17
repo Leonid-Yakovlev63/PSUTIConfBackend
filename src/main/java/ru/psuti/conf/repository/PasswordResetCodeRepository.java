@@ -1,7 +1,7 @@
 package ru.psuti.conf.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.psuti.conf.entity.PasswordResetCode;
+import ru.psuti.conf.entity.confirms.PasswordResetCode;
 
 import java.time.LocalDateTime;
 

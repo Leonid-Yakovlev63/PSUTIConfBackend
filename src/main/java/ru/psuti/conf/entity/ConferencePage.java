@@ -1,21 +1,23 @@
 package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "conference_pages")
+@Builder
+@Entity
+@Table(name = "conference_pages")
 public class ConferencePage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "page_index")
+    private Integer pageIndex;
 
     @Column(name = "path", nullable = false)
     private String path;
@@ -26,8 +28,15 @@ public class ConferencePage {
     @Column(name = "page_name_en")
     private String pageNameEn;
 
-    @Column(name = "html_content", columnDefinition="TEXT")
-    private String htmlContent;
+    @Column(name = "html_content_ru", columnDefinition="TEXT")
+    private String htmlContentRu;
+
+    @Column(name = "html_content_en", columnDefinition="TEXT")
+    private String htmlContentEn;
+
+    @Column(name = "is_enabled", nullable = false)
+    @Builder.Default
+    private Boolean isEnabled = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conference_id")

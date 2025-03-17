@@ -1,25 +1,23 @@
-package ru.psuti.conf.entity;
+package ru.psuti.conf.entity.confirms;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.psuti.conf.entity.auth.User;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "email_change_code")
+@Table(name = "password_reset_code")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailChangeCode {
+public class PasswordResetCode {
 
     @Id
     @Column(nullable = false, unique = true, length = 64)
     private String code;
-
-    @Column(name = "new_email", nullable = false)
-    private String newEmail;
 
     @ManyToOne(targetEntity = User.class, cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", nullable = false)

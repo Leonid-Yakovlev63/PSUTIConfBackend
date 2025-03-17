@@ -23,7 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
-import ru.psuti.conf.entity.Role;
+import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.service.UserService;
 
 import java.util.List;
@@ -58,7 +58,7 @@ public class WebSecurityConfig {
                 log.warn("Запрос выполнен с выключеной защитой cors, так как запущен режим разработки.");
                 var corsConfiguration = new CorsConfiguration();
                 corsConfiguration.setAllowedOriginPatterns(List.of("*"));
-                corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 corsConfiguration.setAllowedHeaders(List.of("*"));
                 corsConfiguration.setAllowCredentials(true);
                 corsConfiguration.setMaxAge(3600L);
@@ -96,6 +96,7 @@ public class WebSecurityConfig {
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers("/users/me").authenticated()
                             .requestMatchers("/users/**").hasRole(Role.ADMIN.name())
+                            .requestMatchers("/conferences", "/conferences/new").hasRole(Role.ADMIN.name())
                             .requestMatchers(HttpMethod.POST, "/conferences").hasRole(Role.ADMIN.name())
                             .anyRequest().permitAll();
                 })

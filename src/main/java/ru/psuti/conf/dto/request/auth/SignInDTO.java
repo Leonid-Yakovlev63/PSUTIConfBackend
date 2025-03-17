@@ -1,10 +1,10 @@
-package ru.psuti.conf.dto.request;
+package ru.psuti.conf.dto.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class SignIn {
+public class SignInDTO {
     @NotBlank
     private String email;
 

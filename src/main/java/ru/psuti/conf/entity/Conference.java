@@ -2,10 +2,13 @@ package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import ru.psuti.conf.entity.auth.ConferenceUserPermissions;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -13,7 +16,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "conferences")
+@Entity
+@Table(name = "conferences")
 public class Conference {
 
     @Id
@@ -23,8 +27,13 @@ public class Conference {
     @Column(unique = true, nullable = false)
     private String slug;
 
+    @Builder.Default
     @Column(name = "is_enabled", nullable = false)
-    private Boolean isEnabled;
+    private Boolean isEnabled = false;
+
+    @Builder.Default
+    @Column(name = "is_enabled_for_registration", nullable = false)
+    private Boolean isEnabledForRegistration = false;
 
     @Column(name = "is_english_enabled", nullable = false)
     private Boolean isEnglishEnabled;
@@ -47,19 +56,45 @@ public class Conference {
     @Column(name = "description_en")
     private String descriptionEn;
 
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private ZonedDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private ZonedDateTime updatedAt;
+
     @Column(name = "start_date")
     private LocalDate startDate;
 
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "closing_date_for_applications")
-    private LocalDate closingDateForApplications;
+    @Column(name = "meeting_point_ru")
+    private String meetingPointRu;
 
-    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
+    @Column(name = "meeting_point_en")
+    private String meetingPointEn;
+
+    @Column(name = "web_site")
+    private String webSite;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "closing_date_for_applications")
+    private ZonedDateTime closingDateForApplications;
+
+    @Column(name = "closing_date_for_registrations")
+    private ZonedDateTime closingDateForRegistrations;
+
+    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>();
 
-    @ManyToMany(cascade = { CascadeType.MERGE })
+    @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
     @JoinTable(
             name = "conferences_organizers",
             joinColumns = @JoinColumn(name = "conference_id"),
@@ -67,15 +102,9 @@ public class Conference {
     )
     private List<ConferenceOrganizer> conferenceOrganizers = new ArrayList<ConferenceOrganizer>();
 
+    @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConferenceUserPermissions> conferenceUserPermissions = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.MERGE})
-    @JoinTable(
-            name = "conferences_admins",
-            joinColumns = @JoinColumn(name = "conference_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> admins = new ArrayList<User>();
-
-    @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.MERGE, orphanRemoval = true)
     private List<ConferencePage> conferencePages = new ArrayList<ConferencePage>();
 }

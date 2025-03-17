@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.psuti.conf.entity.EmailConfirmationCode;
-import ru.psuti.conf.entity.User;
+import ru.psuti.conf.entity.confirms.EmailConfirmationCode;
+import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.repository.EmailConfirmationCodeRepository;
 
 import java.security.SecureRandom;
@@ -71,7 +71,7 @@ public class ConfirmationService {
         );
 
         String text = "Для подтверждения перейдите по ссылке: "
-                + siteDomain + "/confirm-email/code" + "?type=new&code=" + code + "&exp=" + exp;
+                + siteDomain + "/auth/confirm-email/code" + "?type=new&code=" + code + "&exp=" + exp;
 
         emailService.sendEmail(user.getEmail(), "Подтверждение адреса электронной почты", text);
     }

@@ -1,10 +1,8 @@
 package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import ru.psuti.conf.entity.auth.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +11,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "articles")
+@Builder
+@Entity
+@Table(name = "articles")
 public class Article {
 
     @Id
@@ -44,4 +44,13 @@ public class Article {
     )
     private List<User> authors = new ArrayList<User>();
 
+    @Enumerated(EnumType.ORDINAL)
+    @Builder.Default
+    private Status status = Status.PENDING;
+
+    private Short version;
+
+    @ManyToOne
+    @JoinColumn(name = "application_for_participation_id", nullable = false)
+    private ApplicationForParticipation applicationForParticipation;
 }
