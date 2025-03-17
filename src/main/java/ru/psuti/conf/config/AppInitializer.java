@@ -8,8 +8,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import ru.psuti.conf.entity.Role;
-import ru.psuti.conf.entity.User;
+import ru.psuti.conf.entity.Locale;
+import ru.psuti.conf.entity.auth.Role;
+import ru.psuti.conf.entity.auth.User;
+import ru.psuti.conf.entity.auth.UserLocalized;
 import ru.psuti.conf.repository.UserRepository;
 
 import java.nio.file.Files;
@@ -17,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -48,9 +51,15 @@ public class AppInitializer {
                             .email(adminEmail)
                             .password(passwordEncoder.encode(password))
                             .emailVerified(true)
-                            .firstnameRu("admin")
+                            .preferredLocale(Locale.RU)
+                            .names(List.of(
+                                    UserLocalized.builder()
+                                            .locale(Locale.RU)
+                                            .firstName("admin")
+                                            .lastName("admin")
+                                            .build()
+                            ))
                             .role(Role.ADMIN)
-                            .lastnameRu("admin")
                             .build()
             );
         }
