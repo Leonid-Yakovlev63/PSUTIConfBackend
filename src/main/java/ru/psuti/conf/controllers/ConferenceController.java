@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import ru.psuti.conf.dto.request.AddAdminForConferenceDTO;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.*;
 import ru.psuti.conf.entity.Conference;
@@ -15,6 +17,7 @@ import ru.psuti.conf.entity.auth.PermissionFlags;
 import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.service.ConferenceService;
+import ru.psuti.conf.service.ConferenceUserPermissionsService;
 import ru.psuti.conf.service.UserService;
 
 import java.util.*;
@@ -25,6 +28,9 @@ public class ConferenceController {
 
     @Autowired
     private ConferenceService conferenceService;
+
+    @Autowired
+    private ConferenceUserPermissionsService conferenceUserPermissionsService;
 
     @GetMapping
     public List<CompactConferenceDTO> getConferences() {
@@ -128,11 +134,16 @@ public class ConferenceController {
         return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/slug/{slug}/subPage")
+    @PutMapping("/slug/{slug}/subPage")
     public ResponseEntity<ConferencePage> createConferencePage(
             @RequestBody ConferencePageDTO conferencePageDTO,
             @PathVariable String slug
     ){
+
+        if (!hasPagePermission(slug)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         try {
             ConferencePage conferencePage = conferenceService.saveConferencePage(conferencePageDTO, slug);
             return new ResponseEntity<>(conferencePage, HttpStatus.CREATED);
@@ -221,19 +232,37 @@ public class ConferenceController {
         return new ResponseEntity<>("Conference create successfully", HttpStatus.CREATED);
     }
 
+    @PutMapping("/{slug}/admins")
+    public String addAdminForConference(
+            @PathVariable String slug,
+            @RequestBody AddAdminForConferenceDTO addAdminForConferenceDTO
+    ) {
+        Optional<User> optionalUser = UserService.getCurrentUser();
+        if (optionalUser.isEmpty()) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        User user = optionalUser.get();
+
+        if (!user.getRole().equals(Role.ADMIN) && !user.getConferenceUserPermissions().stream().filter(p -> slug.equals(p.getConference().getSlug())).findAny().map(p -> p.hasAnyPermission(PermissionFlags.ADMIN)).orElse(false)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        conferenceUserPermissionsService.addAdminForConference(slug, addAdminForConferenceDTO);
+        return "Ok";
+    }
+
     @GetMapping("/new")
     public List<CompactConferenceDTO> getNewConferences() {
         return conferenceService.getNewConferences();
     }
 
-    private boolean hasPagePermission(Long id) {
+    private boolean hasPagePermission(String slug) {
         Optional<User> optionalUser = UserService.getCurrentUser();
         if(optionalUser.isPresent()){
             if(optionalUser.get().getRole().equals(Role.ADMIN)){
                 return true;
             }
-            Optional<ConferenceUserPermissions> permissions = optionalUser.get().getConferenceUserPermissions().stream().filter(p->p.getId().equals(id)).findAny();
-            return permissions.map(p->p.hasAnyPermission(PermissionFlags.ADMIN, PermissionFlags.READ_HIDDEN_PAGES)).orElse(false);
+            Optional<ConferenceUserPermissions> permissions = optionalUser.get().getConferenceUserPermissions().stream().filter(p->p.getConference().getSlug().equals(slug)).findAny();
+            return permissions.map(p->p.hasAnyPermission(PermissionFlags.ADMIN, PermissionFlags.WRITE_PAGES)).orElse(false);
         }
         return false;
     }
