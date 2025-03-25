@@ -3,6 +3,8 @@ package ru.psuti.conf.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.psuti.conf.dto.request.ConferenceInfoDTO;
+import ru.psuti.conf.dto.request.ConferenceSettingsDTO;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.CompactConferenceDTO;
 import ru.psuti.conf.dto.response.CompactConferencePageDTO;
@@ -95,7 +97,15 @@ public class ConferenceService {
         }
         throw new NoSuchElementException("Conference not found with slug: " + slug);
     }
-    
+
+    public void updateConferenceInfo(String slug, ConferenceInfoDTO conferenceInfoDTO) {
+        conferenceRepository.updateConferenceInfo(slug, conferenceInfoDTO);
+    }
+
+    public void updateConferenceSettings(String slug, ConferenceSettingsDTO conferenceSettingsDTO) {
+        conferenceRepository.updateConferenceSettings(slug, conferenceSettingsDTO);
+    }
+
     @Transactional
     public void activateConferencePage(Long pageId) {
         int updatedRows = conferencePageRepository.activateConferencePage(pageId);

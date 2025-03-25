@@ -21,8 +21,6 @@ public class FullConferenceDTO {
     String conferenceNameEn;
     String statusRu;
     String statusEn;
-    String descriptionRu;
-    String descriptionEn;
     LocalDate startDate;
     LocalDate endDate;
     String meetingPointRu;
@@ -45,8 +43,6 @@ public class FullConferenceDTO {
         this.conferenceNameEn = conference.getConferenceNameEn();
         this.statusRu = conference.getStatusRu();
         this.statusEn = conference.getStatusEn();
-        this.descriptionRu = conference.getDescriptionRu();
-        this.descriptionEn = conference.getDescriptionEn();
         this.startDate = conference.getStartDate();
         this.endDate = conference.getEndDate();
         this.meetingPointRu = conference.getMeetingPointRu();
