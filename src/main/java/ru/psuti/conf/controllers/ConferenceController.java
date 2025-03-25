@@ -9,8 +9,6 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.psuti.conf.dto.request.AddAdminForConferenceDTO;
 import ru.psuti.conf.dto.request.ConferenceInfoDTO;
 import ru.psuti.conf.dto.request.ConferenceSettingsDTO;
-import org.springframework.web.server.ResponseStatusException;
-import ru.psuti.conf.dto.request.AddAdminForConferenceDTO;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.*;
 import ru.psuti.conf.entity.Conference;
@@ -208,8 +206,14 @@ public class ConferenceController {
             @PathVariable String slug,
             @RequestBody ConferenceInfoDTO conferenceInfoDTO
     ) {
-        conferenceService.updateConferenceInfo(slug, conferenceInfoDTO);
-        return "Conference updated successfully";
+        if(conferenceService.existsBySlug(slug)){
+            conferenceService.updateConferenceInfo(slug, conferenceInfoDTO);
+            return "Conference updated successfully";
+        }
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Conference not found with slug: " + slug
+        );
     }
 
     @PutMapping("/slug/{slug}/settings")
@@ -217,8 +221,14 @@ public class ConferenceController {
             @PathVariable String slug,
             @RequestBody ConferenceSettingsDTO conferenceSettingsDTO
     ) {
-        conferenceService.updateConferenceSettings(slug, conferenceSettingsDTO);
-        return "Conference updated successfully";
+        if(conferenceService.existsBySlug(slug)){
+            conferenceService.updateConferenceSettings(slug, conferenceSettingsDTO);
+            return "Conference updated successfully";
+        }
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Conference not found with slug: " + slug
+        );
     }
 
 

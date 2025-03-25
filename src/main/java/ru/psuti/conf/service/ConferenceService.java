@@ -68,6 +68,10 @@ public class ConferenceService {
         return conferencePageRepository.findAllByConferenceSlug(slug);
     }
 
+    public boolean existsBySlug(String slug){
+        return conferenceRepository.existsBySlug(slug);
+    }
+
     @Transactional
     public ConferencePage saveConferencePage(ConferencePageDTO conferencePageDTO, String slug) {
 
