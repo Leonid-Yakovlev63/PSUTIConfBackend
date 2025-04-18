@@ -137,7 +137,8 @@ public class ConferenceService {
     public Optional<Conference> createConference(CreateConferenceDTO createConferenceDto){
         if (conferenceRepository.existsBySlug(createConferenceDto.getSlug()))
             return Optional.empty();
-        return Optional.of(conferenceRepository.save(
+
+        Conference conference = conferenceRepository.save(
                 Conference.builder()
                         .slug(createConferenceDto.getSlug())
                         .isEnglishEnabled(createConferenceDto.getIsEnglishEnabled())
@@ -148,7 +149,46 @@ public class ConferenceService {
                         .startDate(createConferenceDto.getStartDate())
                         .endDate(createConferenceDto.getEndDate())
                         .build()
-        ));
+        );
+
+        List<ConferencePage> pages = createDefaultPages(conference);
+
+        for (ConferencePage page : pages) {
+            conferencePageRepository.save(page);
+        }
+
+        return Optional.of(conference);
+
+    }
+
+    private List<ConferencePage> createDefaultPages(Conference conference) {
+        List<ConferencePage> pages = new ArrayList<>();
+
+        pages.add(ConferencePage.builder()
+                .path("index")
+                .pageNameRu("Главная")
+                .pageNameEn("Home")
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        pages.add(ConferencePage.builder()
+                .path("info")
+                .pageNameRu("Информация")
+                .pageNameEn("Information")
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        pages.add(ConferencePage.builder()
+                .path("contacts")
+                .pageNameRu("Контакты")
+                .pageNameEn("Contacts")
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        return pages;
     }
 
     // +
