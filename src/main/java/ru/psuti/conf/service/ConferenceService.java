@@ -168,6 +168,7 @@ public class ConferenceService {
                 .path("index")
                 .pageNameRu("Главная")
                 .pageNameEn("Home")
+                .pageIndex(1)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
@@ -176,6 +177,7 @@ public class ConferenceService {
                 .path("info")
                 .pageNameRu("Информация")
                 .pageNameEn("Information")
+                .pageIndex(2)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
@@ -184,6 +186,7 @@ public class ConferenceService {
                 .path("contacts")
                 .pageNameRu("Контакты")
                 .pageNameEn("Contacts")
+                .pageIndex(3)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
