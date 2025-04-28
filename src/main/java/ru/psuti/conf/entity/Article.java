@@ -3,9 +3,12 @@ package ru.psuti.conf.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.psuti.conf.entity.auth.User;
+import ru.psuti.conf.util.JSONConverter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -40,9 +43,9 @@ public class Article {
     @JoinTable(
             name = "articles_authors",
             joinColumns = @JoinColumn(name = "article_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "author_id")
     )
-    private List<User> authors = new ArrayList<User>();
+    private List<ArticleAuthor> authors = new ArrayList<>();
 
     @Enumerated(EnumType.ORDINAL)
     @Builder.Default
@@ -50,7 +53,12 @@ public class Article {
 
     private Short version;
 
+
     @ManyToOne
-    @JoinColumn(name = "application_for_participation_id", nullable = false)
-    private ApplicationForParticipation applicationForParticipation;
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Convert(converter = JSONConverter.class)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> additionalFields = new HashMap<>();
 }
