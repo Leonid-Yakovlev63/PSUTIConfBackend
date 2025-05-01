@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.psuti.conf.dto.request.AddAdminForConferenceDTO;
+import ru.psuti.conf.dto.request.ConferenceInfoDTO;
+import ru.psuti.conf.dto.request.ConferenceSettingsDTO;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.*;
 import ru.psuti.conf.entity.Conference;
@@ -160,13 +162,9 @@ public class ConferenceController {
             @PathVariable String path,
             @RequestBody ConferencePageDTO conferencePageDTO
     ) {
-
         try {
             ConferencePage conferencePage = conferenceService.updateConferencePage(conferencePageDTO, slug, path);
             ConferencePageDTO returningConferencePageDTO = ConferencePageDTO.builder()
-                    .path(conferencePage.getPath())
-                    .pageNameRu(conferencePage.getPageNameRu())
-                    .pageNameEn(conferencePage.getPageNameEn())
                     .htmlContentRu(conferencePage.getHtmlContentRu())
                     .htmlContentEn(conferencePage.getHtmlContentEn())
                     .build();
@@ -176,7 +174,6 @@ public class ConferenceController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     /*
@@ -203,6 +200,38 @@ public class ConferenceController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Conference not found");
         }
     }
+
+    @PutMapping("/slug/{slug}/info")
+    public String updateConferenceInfo(
+            @PathVariable String slug,
+            @RequestBody ConferenceInfoDTO conferenceInfoDTO
+    ) {
+        if(conferenceService.existsBySlug(slug)){
+            conferenceService.updateConferenceInfo(slug, conferenceInfoDTO);
+            return "Conference updated successfully";
+        }
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Conference not found with slug: " + slug
+        );
+    }
+
+    @PutMapping("/slug/{slug}/settings")
+    public String updateConferenceSettings(
+            @PathVariable String slug,
+            @RequestBody ConferenceSettingsDTO conferenceSettingsDTO
+    ) {
+        if(conferenceService.existsBySlug(slug)){
+            conferenceService.updateConferenceSettings(slug, conferenceSettingsDTO);
+            return "Conference updated successfully";
+        }
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Conference not found with slug: " + slug
+        );
+    }
+
+
     @PatchMapping("/slug/{slug}/subPage/{pageId}/activate")
     public ResponseEntity<String> activateConferencePage(@PathVariable Long pageId) {
         conferenceService.activateConferencePage(pageId);

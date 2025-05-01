@@ -3,6 +3,8 @@ package ru.psuti.conf.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.psuti.conf.dto.request.ConferenceInfoDTO;
+import ru.psuti.conf.dto.request.ConferenceSettingsDTO;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.CompactConferenceDTO;
 import ru.psuti.conf.dto.response.CompactConferencePageDTO;
@@ -66,6 +68,10 @@ public class ConferenceService {
         return conferencePageRepository.findAllByConferenceSlug(slug);
     }
 
+    public boolean existsBySlug(String slug){
+        return conferenceRepository.existsBySlug(slug);
+    }
+
     @Transactional
     public ConferencePage saveConferencePage(ConferencePageDTO conferencePageDTO, String slug) {
 
@@ -95,7 +101,15 @@ public class ConferenceService {
         }
         throw new NoSuchElementException("Conference not found with slug: " + slug);
     }
-    
+
+    public void updateConferenceInfo(String slug, ConferenceInfoDTO conferenceInfoDTO) {
+        conferenceRepository.updateConferenceInfo(slug, conferenceInfoDTO);
+    }
+
+    public void updateConferenceSettings(String slug, ConferenceSettingsDTO conferenceSettingsDTO) {
+        conferenceRepository.updateConferenceSettings(slug, conferenceSettingsDTO);
+    }
+
     @Transactional
     public void activateConferencePage(Long pageId) {
         int updatedRows = conferencePageRepository.activateConferencePage(pageId);
@@ -123,7 +137,8 @@ public class ConferenceService {
     public Optional<Conference> createConference(CreateConferenceDTO createConferenceDto){
         if (conferenceRepository.existsBySlug(createConferenceDto.getSlug()))
             return Optional.empty();
-        return Optional.of(conferenceRepository.save(
+
+        Conference conference = conferenceRepository.save(
                 Conference.builder()
                         .slug(createConferenceDto.getSlug())
                         .isEnglishEnabled(createConferenceDto.getIsEnglishEnabled())
@@ -134,7 +149,49 @@ public class ConferenceService {
                         .startDate(createConferenceDto.getStartDate())
                         .endDate(createConferenceDto.getEndDate())
                         .build()
-        ));
+        );
+
+        List<ConferencePage> pages = createDefaultPages(conference);
+
+        for (ConferencePage page : pages) {
+            conferencePageRepository.save(page);
+        }
+
+        return Optional.of(conference);
+
+    }
+
+    private List<ConferencePage> createDefaultPages(Conference conference) {
+        List<ConferencePage> pages = new ArrayList<>();
+
+        pages.add(ConferencePage.builder()
+                .path("index")
+                .pageNameRu("Главная")
+                .pageNameEn("Home")
+                .pageIndex(1)
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        pages.add(ConferencePage.builder()
+                .path("info")
+                .pageNameRu("Информация")
+                .pageNameEn("Information")
+                .pageIndex(2)
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        pages.add(ConferencePage.builder()
+                .path("contacts")
+                .pageNameRu("Контакты")
+                .pageNameEn("Contacts")
+                .pageIndex(3)
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        return pages;
     }
 
     // +

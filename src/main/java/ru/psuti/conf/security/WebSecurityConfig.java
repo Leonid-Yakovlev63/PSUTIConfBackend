@@ -69,7 +69,7 @@ public class WebSecurityConfig {
             http.cors(cors -> cors.configurationSource(request -> {
                 var corsConfiguration = new CorsConfiguration();
                 corsConfiguration.setAllowedOriginPatterns(allowedOrigins);
-                corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 corsConfiguration.setAllowedHeaders(List.of("*"));
                 corsConfiguration.setAllowCredentials(true);
                 corsConfiguration.setMaxAge(3600L);
@@ -95,6 +95,7 @@ public class WebSecurityConfig {
                     request
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers("/users/me").authenticated()
+                            .requestMatchers("/articles/**").authenticated()
                             .requestMatchers("/users/**").hasRole(Role.ADMIN.name())
                             .requestMatchers("/conferences", "/conferences/new").hasRole(Role.ADMIN.name())
                             .requestMatchers(HttpMethod.POST, "/conferences").hasRole(Role.ADMIN.name())

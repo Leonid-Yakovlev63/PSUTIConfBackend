@@ -25,36 +25,30 @@ public class Conference {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String slug;
+    private String slug; // Info
 
     @Builder.Default
     @Column(name = "is_enabled", nullable = false)
-    private Boolean isEnabled = false;
+    private Boolean isEnabled = false; // Settings
 
     @Builder.Default
     @Column(name = "is_enabled_for_registration", nullable = false)
-    private Boolean isEnabledForRegistration = false;
+    private Boolean isEnabledForRegistration = false; // Settings
 
     @Column(name = "is_english_enabled", nullable = false)
-    private Boolean isEnglishEnabled;
+    private Boolean isEnglishEnabled; // Settings
 
     @Column(name = "conference_name_ru", nullable = false)
-    private String conferenceNameRu;
+    private String conferenceNameRu; // Info
 
     @Column(name = "conference_name_en")
-    private String conferenceNameEn;
+    private String conferenceNameEn; // Info
 
     @Column(name = "status_ru")
-    private String statusRu;
+    private String statusRu; // Info
 
     @Column(name = "status_en")
-    private String statusEn;
-
-    @Column(name = "description_ru")
-    private String descriptionRu;
-
-    @Column(name = "description_en")
-    private String descriptionEn;
+    private String statusEn; // Info
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -65,34 +59,34 @@ public class Conference {
     private ZonedDateTime updatedAt;
 
     @Column(name = "start_date")
-    private LocalDate startDate;
+    private LocalDate startDate; // Info
 
     @Column(name = "end_date")
-    private LocalDate endDate;
+    private LocalDate endDate; // Info
 
     @Column(name = "meeting_point_ru")
-    private String meetingPointRu;
+    private String meetingPointRu; // Info
 
     @Column(name = "meeting_point_en")
-    private String meetingPointEn;
+    private String meetingPointEn; // Info
 
     @Column(name = "web_site")
-    private String webSite;
+    private String webSite; // Info
 
     @Column(name = "email")
-    private String email;
+    private String email; // Info
 
     @Column(name = "phone")
-    private String phone;
+    private String phone; // Info
 
     @Column(name = "closing_date_for_applications")
-    private ZonedDateTime closingDateForApplications;
+    private ZonedDateTime closingDateForApplications; // Info
 
     @Column(name = "closing_date_for_registrations")
-    private ZonedDateTime closingDateForRegistrations;
+    private ZonedDateTime closingDateForRegistrations; // Info
 
     @OneToMany(mappedBy = "conference", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>();
+    private List<ConferenceSection> conferenceSections = new ArrayList<ConferenceSection>(); // Отдельная страница Sections
 
     @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
     @JoinTable(
@@ -103,8 +97,8 @@ public class Conference {
     private List<ConferenceOrganizer> conferenceOrganizers = new ArrayList<ConferenceOrganizer>();
 
     @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ConferenceUserPermissions> conferenceUserPermissions = new ArrayList<>();
+    private List<ConferenceUserPermissions> conferenceUserPermissions = new ArrayList<>(); // Отдельная страница Admins
 
     @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.MERGE, orphanRemoval = true)
-    private List<ConferencePage> conferencePages = new ArrayList<ConferencePage>();
+    private List<ConferencePage> conferencePages = new ArrayList<ConferencePage>(); // Отдельная страница
 }
