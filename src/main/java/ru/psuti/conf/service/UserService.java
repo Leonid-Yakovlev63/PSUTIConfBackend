@@ -1,6 +1,8 @@
 package ru.psuti.conf.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -8,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.psuti.conf.dto.response.auth.CompactUserDTO;
 import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.repository.EmailChangeCodeRepository;
@@ -69,6 +72,10 @@ public class UserService {
 
     public boolean existsUserById(Long id) {
         return userRepository.existsById(id);
+    }
+
+    public Page<CompactUserDTO> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).map(CompactUserDTO::new);
     }
 
 }
