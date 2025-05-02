@@ -8,12 +8,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.psuti.conf.entity.Locale;
 import ru.psuti.conf.validation.anotation.PreferredLocaleInNames;
+import ru.psuti.conf.validation.validator.PreferredLocaleInterface;
 
 import java.util.Map;
 
 @Data
 @PreferredLocaleInNames
-public class SignUpDTO {
+public class SignUpDTO implements PreferredLocaleInterface {
     @Email
     @NotBlank
     @Size(max = 255)

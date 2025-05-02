@@ -10,13 +10,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.psuti.conf.dto.request.UpdateUserDTO;
 import ru.psuti.conf.dto.response.auth.CompactUserDTO;
 import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.entity.auth.User;
+import ru.psuti.conf.entity.auth.UserLocalized;
 import ru.psuti.conf.repository.EmailChangeCodeRepository;
 import ru.psuti.conf.repository.UserRepository;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,11 +71,11 @@ public class UserService {
         return this::getByUsername;
     }
 
-    public void deleteUserById(Long id) {
+    public void deleteUserById(UUID id) {
         userRepository.deleteById(id);
     }
 
-    public boolean existsUserById(Long id) {
+    public boolean existsUserById(UUID id) {
         return userRepository.existsById(id);
     }
 
@@ -78,4 +83,30 @@ public class UserService {
         return userRepository.findAll(pageable).map(CompactUserDTO::new);
     }
 
+    public Optional<User> getUserById(UUID id){
+        return userRepository.findById(id);
+    }
+
+    public Optional<User> updateUser(UpdateUserDTO updateUserDTO, UUID id) throws NoSuchElementException {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(optionalUser.isEmpty()) {
+            throw new NoSuchElementException(String.format("User with ID = {%s} not found", id));
+        }
+        User user = optionalUser.get();
+        user.setCountry(updateUserDTO.getCountry());
+        user.setCity(updateUserDTO.getCity());
+        user.setOrganization(updateUserDTO.getOrganization());
+        user.setOrganizationAddress(updateUserDTO.getOrganizationAddress());
+        user.setPreferredLocale(updateUserDTO.getPreferredLocale());
+        user.getNames().clear();
+        user.getNames().addAll(updateUserDTO.getNames().entrySet().stream().map(entry ->
+                UserLocalized.builder()
+                .user(user)
+                .firstName(entry.getValue().getFirstName())
+                .lastName(entry.getValue().getLastName())
+                .middleName(entry.getValue().getMiddleName())
+                .locale(entry.getKey())
+                .build()).toList());
+        return Optional.of(userRepository.save(user));
+    }
 }

@@ -95,7 +95,7 @@ public class WebSecurityConfig {
                     request
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .requestMatchers("/users/me").authenticated()
-                            .requestMatchers("/users/**").hasRole(Role.ADMIN.name())
+                            .requestMatchers("/users", "/users/**").hasRole(Role.ADMIN.name())
                             .requestMatchers("/conferences", "/conferences/new").hasRole(Role.ADMIN.name())
                             .requestMatchers(HttpMethod.POST, "/conferences").hasRole(Role.ADMIN.name())
                             .anyRequest().permitAll();
