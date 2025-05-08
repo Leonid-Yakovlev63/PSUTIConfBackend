@@ -32,6 +32,7 @@ public class ConferenceService {
     }
 
     public Optional<Conference> getConferenceById(Long id) {
+        if (id == null) return Optional.empty();
         return conferenceRepository.findById(id);
     }
 
