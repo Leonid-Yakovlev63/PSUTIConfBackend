@@ -101,4 +101,7 @@ public class Conference {
 
     @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.MERGE, orphanRemoval = true)
     private List<ConferencePage> conferencePages = new ArrayList<ConferencePage>(); // Отдельная страница
+
+    @Column(name = "supported_file_formats", length = 2048)
+    private String supportedFileFormats;
 }

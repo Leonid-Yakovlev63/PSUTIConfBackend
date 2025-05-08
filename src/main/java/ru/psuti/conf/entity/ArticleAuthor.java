@@ -22,6 +22,7 @@ import java.util.Map;
 public class ArticleAuthor {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String email;
@@ -60,7 +61,7 @@ public class ArticleAuthor {
     @OneToOne(targetEntity = ScientistRank.class, cascade = CascadeType.MERGE)
     private ScientistRank scientistRank;
 
-    @Convert(converter = JSONConverter.class)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> additionalFields = new HashMap<>();
+//    @Convert(converter = JSONConverter.class)
+//    @Column(columnDefinition = "jsonb")
+//    private Map<String, Object> additionalFields = new HashMap<>();
 }
