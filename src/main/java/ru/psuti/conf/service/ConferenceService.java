@@ -165,19 +165,46 @@ public class ConferenceService {
         List<ConferencePage> pages = new ArrayList<>();
 
         pages.add(ConferencePage.builder()
-                .path("index")
-                .pageNameRu("Главная")
-                .pageNameEn("Home")
+                .path("info")
+                .pageNameRu("Информация")
+                .pageNameEn("Information")
                 .pageIndex(1)
+                .isEnabled(true)
+                .conference(conference)
+                .build());
+
+        pages.add(ConferencePage.builder()
+                .path("committee")
+                .pageNameRu("Комитет")
+                .pageNameEn("Committee")
+                .pageIndex(2)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
 
         pages.add(ConferencePage.builder()
-                .path("info")
-                .pageNameRu("Информация")
-                .pageNameEn("Information")
-                .pageIndex(2)
+                .path("program")
+                .pageNameRu("Программа")
+                .pageNameEn("Program")
+                .pageIndex(3)
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        pages.add(ConferencePage.builder()
+                .path("proceedings")
+                .pageNameRu("Заседание")
+                .pageNameEn("Proceedings")
+                .pageIndex(4)
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        pages.add(ConferencePage.builder()
+                .path("report")
+                .pageNameRu("Труды")
+                .pageNameEn("Report")
+                .pageIndex(5)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
@@ -186,7 +213,7 @@ public class ConferenceService {
                 .path("contacts")
                 .pageNameRu("Контакты")
                 .pageNameEn("Contacts")
-                .pageIndex(3)
+                .pageIndex(6)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
