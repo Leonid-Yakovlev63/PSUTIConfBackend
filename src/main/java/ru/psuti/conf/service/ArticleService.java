@@ -19,6 +19,7 @@ import ru.psuti.conf.repository.FileRepository;
 import ru.psuti.conf.security.CustomAuthenticationEntryPoint;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +49,7 @@ public class ArticleService {
     @Autowired
     private FileRepository fileRepository;
 
-    @Value("${files.upload-dir}/private")
+    @Value("${files.upload-dir}/private/")
     private String FILE_UPLOAD_DIR;
 
     @Autowired
@@ -125,24 +126,24 @@ public class ArticleService {
         Article article = optionalArticle.get();
 
         String fileName = file.getOriginalFilename();
-        if (fileName == null || !fileName.contains(".")) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Invalid file format"
-            );
-        }
-
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
 
         List<String> supportedFileTypes = List.of(article.getSection().getConference().getSupportedFileFormats().toLowerCase().split(","));
-
-        if(!supportedFileTypes.contains(fileExtension)) {
+        
+        String fileExtension = null;
+        
+        for (String type : supportedFileTypes) {
+            if (Objects.requireNonNull(fileName).endsWith("."+type)) {
+                fileExtension = type;
+                break;
+            };
+        }
+        
+        if (fileExtension == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Unsupported file format: " + fileExtension
             );
         }
-
 
         FileInfo fileInfo = FileInfo.builder()
                 .name(fileName)
@@ -153,10 +154,24 @@ public class ArticleService {
 
         Path path = Paths.get(FILE_UPLOAD_DIR + fileName);
 
-        Files.copy(file.getInputStream(), path);
+        try {
+            Files.copy(file.getInputStream(), path);
 
-        if (!Files.exists(path)) {
-            throw new IOException("File was not saved successfully");
+            if (!Files.exists(path)) {
+                throw new IOException("File was not saved successfully");
+            }
+        } catch (FileAlreadyExistsException e) {
+            String baseName = fileName.substring(0, fileName.length() - fileExtension.length()-1);
+
+            String fileNameOnDisk = baseName + "_" + ZonedDateTime.now().toEpochSecond() + "." + fileExtension;
+            path = Paths.get(FILE_UPLOAD_DIR + fileNameOnDisk);
+            Files.copy(file.getInputStream(), path);
+
+            if (!Files.exists(path)) {
+                throw new IOException("File was not saved successfully");
+            }
+
+            fileInfo.setName(fileNameOnDisk);
         }
 
         return fileRepository.save(fileInfo);
