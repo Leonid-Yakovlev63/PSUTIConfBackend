@@ -11,8 +11,10 @@ import ru.psuti.conf.dto.response.CompactConferencePageDTO;
 import ru.psuti.conf.dto.response.ConferencePageDTO;
 import ru.psuti.conf.entity.Conference;
 import ru.psuti.conf.entity.ConferencePage;
+import ru.psuti.conf.entity.ConferenceSection;
 import ru.psuti.conf.repository.ConferencePageRepository;
 import ru.psuti.conf.repository.ConferenceRepository;
+import ru.psuti.conf.repository.ConferenceSectionRepository;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -26,6 +28,9 @@ public class ConferenceService {
 
     @Autowired
     private ConferencePageRepository conferencePageRepository;
+
+    @Autowired
+    private ConferenceSectionRepository conferenceSectionRepository;
 
     public List<CompactConferenceDTO> getConferences() {
         return conferenceRepository.findAll().stream().map(CompactConferenceDTO::new).collect(Collectors.toList());
@@ -157,8 +162,26 @@ public class ConferenceService {
             conferencePageRepository.save(page);
         }
 
+        List<ConferenceSection> sections = createDefaultSections(conference);
+
+        for (ConferenceSection section : sections) {
+            conferenceSectionRepository.save(section);
+        }
+
         return Optional.of(conference);
 
+    }
+
+    private List<ConferenceSection> createDefaultSections(Conference conference) {
+        List<ConferenceSection> sections = new ArrayList<>();
+
+        sections.add(ConferenceSection.builder()
+                .sectionName("Без секции")
+                .description("Стандартная секция")
+                .conference(conference)
+                .build());
+
+        return sections;
     }
 
     private List<ConferencePage> createDefaultPages(Conference conference) {
