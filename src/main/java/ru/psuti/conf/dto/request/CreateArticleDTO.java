@@ -20,8 +20,6 @@ public class CreateArticleDTO {
      String descriptionEn;
 
      @NotNull
-     Long conferenceId;
-
      Long sectionId;
 
      List<AuthorDTO> authors;

@@ -14,6 +14,7 @@ public class ScientificDegreeService {
     private ScientificDegreeRepository scientificDegreeRepository;
 
     public Optional<ScientificDegree> getScientificDegreeById(Long id) {
+        if (id == null) return Optional.empty();
         return scientificDegreeRepository.findById(id);
     }
 }
