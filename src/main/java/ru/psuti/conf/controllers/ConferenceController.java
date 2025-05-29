@@ -11,6 +11,7 @@ import ru.psuti.conf.dto.request.ConferenceInfoDTO;
 import ru.psuti.conf.dto.request.ConferenceSettingsDTO;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.*;
+import ru.psuti.conf.dto.response.auth.CompactUserDTO;
 import ru.psuti.conf.entity.Conference;
 import ru.psuti.conf.entity.*;
 import ru.psuti.conf.entity.Locale;
@@ -238,7 +239,6 @@ public class ConferenceController {
         return ResponseEntity.ok("Conference page activated successfully");
     }
 
-
     @GetMapping("/years")
     public List<Short> getYears() {
         return conferenceService.getYears();
@@ -277,6 +277,22 @@ public class ConferenceController {
 
         conferenceUserPermissionsService.addAdminForConference(slug, addAdminForConferenceDTO);
         return "Ok";
+    }
+
+    @GetMapping("/{slug}/admins")
+    public List<ConferenceAdminDTO> getConferenceAdmins(
+            @PathVariable String slug
+    ) {
+        Optional<User> optionalUser = UserService.getCurrentUser();
+        if (optionalUser.isEmpty()) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        User user = optionalUser.get();
+
+        if (!user.getRole().equals(Role.ADMIN) && !user.getConferenceUserPermissions().stream().filter(p -> slug.equals(p.getConference().getSlug())).findAny().map(p -> p.hasAnyPermission(PermissionFlags.ADMIN)).orElse(false)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        return conferenceUserPermissionsService.getConferenceAdmins(slug);
     }
 
     @GetMapping("/new")
