@@ -293,6 +293,24 @@ public class ConferenceController {
         return "Ok";
     }
 
+    @DeleteMapping("/{slug}/admins/{id}")
+    public ResponseEntity<String> deleteConferenceAdmin(
+            @PathVariable String slug,
+            @PathVariable UUID id
+    ) {
+        Optional<User> optionalUser = UserService.getCurrentUser();
+        if (optionalUser.isEmpty()) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        User user = optionalUser.get();
+
+        if (!user.getRole().equals(Role.ADMIN) && !user.getConferenceUserPermissions().stream().filter(p -> slug.equals(p.getConference().getSlug())).findAny().map(p -> p.hasAnyPermission(PermissionFlags.ADMIN)).orElse(false)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        conferenceUserPermissionsService.deleteConferenceAdmin(slug, id);
+        return ResponseEntity.ok("The conference administrator has been successfully removed.");
+    }
+
     @GetMapping("/{slug}/admins")
     public List<ConferenceAdminDTO> getConferenceAdmins(
             @PathVariable String slug

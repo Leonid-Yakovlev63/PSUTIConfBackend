@@ -18,10 +18,7 @@ import ru.psuti.conf.repository.ConferenceRepository;
 import ru.psuti.conf.repository.ConferenceUserPermissionsRepository;
 import ru.psuti.conf.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +30,7 @@ public class ConferenceUserPermissionsService {
     private final UserRepository userRepository;
 
     private final ConferenceUserPermissionsRepository conferenceUserPermissionsRepository;
+
 
     @Transactional
     public void addAdminForConference(String slug, AddAdminForConferenceDTO addAdminForConferenceDTO) {
@@ -50,6 +48,14 @@ public class ConferenceUserPermissionsService {
 
         User user = optionalUser.get();
 
+        Optional<ConferenceUserPermissions> optionalConferenceUserPermissions = conferenceUserPermissionsRepository.findByConference_SlugAndUser(slug, user);
+        if(optionalConferenceUserPermissions.isPresent()) {
+            ConferenceUserPermissions conferenceUserPermissions = optionalConferenceUserPermissions.get();
+            conferenceUserPermissions.setPermissions(addAdminForConferenceDTO.getPermissions());
+            conferenceUserPermissionsRepository.save(conferenceUserPermissions);
+            return;
+        }
+
         conferenceUserPermissionsRepository.save(
                 ConferenceUserPermissions.builder()
                         .permissions(addAdminForConferenceDTO.getPermissions())
@@ -57,6 +63,15 @@ public class ConferenceUserPermissionsService {
                         .conference(conference)
                         .build()
         );
+    }
+
+    @Transactional
+    public void deleteConferenceAdmin(String slug, UUID id) {
+
+        int deletedRows = conferenceUserPermissionsRepository.deleteByConference_SlugAndUser_Id(slug, id);
+        if(deletedRows == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Conference or user not found");
+        }
     }
 
     public List<ConferenceAdminDTO> getConferenceAdmins(String slug) {
