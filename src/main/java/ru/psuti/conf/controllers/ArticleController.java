@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import ru.psuti.conf.dto.request.CreateArticleDTO;
+import ru.psuti.conf.dto.response.FileInfoDTO;
 import ru.psuti.conf.entity.Article;
 import ru.psuti.conf.entity.FileInfo;
 import ru.psuti.conf.service.ArticleService;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -35,7 +37,7 @@ public class ArticleController {
     }
 
     @PostMapping(value = "/{articleId}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<FileInfo> uploadFile(
+    public ResponseEntity<FileInfoDTO> uploadFile(
             @PathVariable Long articleId,
             @RequestParam("file") MultipartFile file
     ) {
@@ -43,7 +45,14 @@ public class ArticleController {
             FileInfo uploadedFile = articleService.uploadArticleFile(articleId, file);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(uploadedFile);
+                    .body(FileInfoDTO.builder()
+                            .id(uploadedFile.getId())
+                            .size(uploadedFile.getSize())
+                            .name(uploadedFile.getName())
+                            .fileType(uploadedFile.getFileType())
+                            .uploadDate(LocalDate.now())
+                            .articleId(uploadedFile.getArticle().getId())
+                            .build());
         } catch (IOException e) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
