@@ -102,6 +102,7 @@ public class Conference {
     @OneToMany(mappedBy = "conference", fetch = FetchType.LAZY, cascade = CascadeType.MERGE, orphanRemoval = true)
     private List<ConferencePage> conferencePages = new ArrayList<ConferencePage>(); // Отдельная страница
 
+    @Builder.Default
     @Column(name = "supported_file_formats", length = 2048, columnDefinition = "VARCHAR(2048) DEFAULT 'doc,docx,pdf'")
-    private String supportedFileFormats;
+    private String supportedFileFormats = "doc,docx,pdf";
 }
