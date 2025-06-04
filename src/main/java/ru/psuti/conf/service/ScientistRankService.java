@@ -15,6 +15,7 @@ public class ScientistRankService {
     private ScientistRankRepository scientistRankRepository;
 
     public Optional<ScientistRank> getScientistRankById(Long id) {
+        if (id == null) return Optional.empty();
         return scientistRankRepository.findById(id);
     }
 }

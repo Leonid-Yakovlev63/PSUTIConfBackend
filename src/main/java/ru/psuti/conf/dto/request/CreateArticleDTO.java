@@ -6,6 +6,7 @@ import lombok.Value;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Map;
 
 @Value
 public class CreateArticleDTO {
@@ -19,10 +20,9 @@ public class CreateArticleDTO {
      String descriptionEn;
 
      @NotNull
-     Long conferenceId;
-
      Long sectionId;
 
      List<AuthorDTO> authors;
 
+//     Map<String, Object> additionalFields;
 }

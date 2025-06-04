@@ -2,6 +2,9 @@ package ru.psuti.conf.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.util.JSONConverter;
 
@@ -39,7 +42,7 @@ public class Article {
     @JoinColumn(name = "section_id")
     private ConferenceSection section;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "articles_authors",
             joinColumns = @JoinColumn(name = "article_id"),
@@ -58,7 +61,16 @@ public class Article {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Convert(converter = JSONConverter.class)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> additionalFields = new HashMap<>();
+//    @Column
+//    @Convert(converter = JSONConverter.class)
+//    private Map<String, Object> additionalFields = new HashMap<>();
+
+    @OneToMany(
+            mappedBy = "article",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private List<FileInfo> articleFiles = new ArrayList<>();
 }

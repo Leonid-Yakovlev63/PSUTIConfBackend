@@ -2,13 +2,30 @@ package ru.psuti.conf.service;
 
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import ru.psuti.conf.dto.request.CreateArticleDTO;
 import ru.psuti.conf.entity.*;
+import ru.psuti.conf.entity.auth.PermissionFlags;
+import ru.psuti.conf.entity.auth.Role;
+import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.repository.ArticleRepository;
+import ru.psuti.conf.repository.ConferenceSectionRepository;
+import ru.psuti.conf.repository.FileRepository;
+import ru.psuti.conf.security.CustomAuthenticationEntryPoint;
 
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,19 +46,41 @@ public class ArticleService {
     @Autowired
     private ScientistRankService scientistRankService;
 
+    @Autowired
+    private FileRepository fileRepository;
+
+    @Value("${files.upload-dir}/private/")
+    private String FILE_UPLOAD_DIR;
+
+    @Autowired
+    private ConferenceSectionRepository conferenceSectionRepository;
+
     public Optional<Article> createArticle(CreateArticleDTO createArticleDTO) {
-
-        Optional<Conference> optionalConference = this.conferenceService.getConferenceById(createArticleDTO.getConferenceId());
-        if(optionalConference.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,String.format("conference with id = {%d} not found", createArticleDTO.getConferenceId()));
-        }
-
-        Conference conference = optionalConference.get();
-        Optional<ConferenceSection> optionalConferenceSection = conference.getConferenceSections().stream().filter(conferenceSection -> Objects.equals(conferenceSection.getId(), createArticleDTO.getConferenceId())).findAny();
+        Optional<ConferenceSection> optionalConferenceSection = conferenceSectionRepository.findById(createArticleDTO.getSectionId());
         if(optionalConferenceSection.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,String.format("conference section with id = {%d} not found", createArticleDTO.getSectionId()));
         }
         ConferenceSection conferenceSection = optionalConferenceSection.get();
+
+        Conference conference = conferenceSection.getConference();
+
+        User user = UserService.getCurrentUser().orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        ZonedDateTime endDate = conference.getClosingDateForRegistrations() != null
+                ? conference.getClosingDateForRegistrations()
+                : conference.getEndDate().atStartOfDay(ZoneId.of("UTC+04"));
+
+        if (
+                endDate.isAfter(ZonedDateTime.now()) &&
+                !user.getRole().equals(Role.ADMIN) &&
+                !user.getConferenceUserPermissions().stream()
+                        .filter(cup -> Objects.equals(cup.getConference().getId(), conference.getId()))
+                        .findAny()
+                        .map(cup -> cup.hasAnyPermission(PermissionFlags.ADMIN, PermissionFlags.CREATE_CONF_APP))
+                        .orElse(false)
+        ) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
 
         Article article = Article.builder()
                 .titleRu(createArticleDTO.getTitleRu())
@@ -49,7 +88,9 @@ public class ArticleService {
                 .descriptionRu(createArticleDTO.getDescriptionRu())
                 .descriptionEn(createArticleDTO.getDescriptionEn())
                 .section(conferenceSection)
-                .user(UserService.getCurrentUser().get())
+                .user(user)
+                .version((short)1)
+//                .additionalFields(createArticleDTO.getAdditionalFields())
                 .authors(createArticleDTO.getAuthors().stream().map(authorDTO ->
                                 ArticleAuthor.builder()
                                         .email(authorDTO.getEmail())
@@ -71,4 +112,70 @@ public class ArticleService {
                 .build();
         return Optional.of(this.articleRepository.save(article));
     }
+
+    public FileInfo uploadArticleFile(Long articleId, MultipartFile file) throws IOException, NoSuchElementException {
+
+        Optional<Article> optionalArticle = articleRepository.findById(articleId);
+        if(optionalArticle.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    String.format("Article with id = {%d} not found", articleId)
+            );
+        }
+
+        Article article = optionalArticle.get();
+
+        String fileName = file.getOriginalFilename();
+
+        List<String> supportedFileTypes = List.of(article.getSection().getConference().getSupportedFileFormats().toLowerCase().split(","));
+        
+        String fileExtension = null;
+        
+        for (String type : supportedFileTypes) {
+            if (Objects.requireNonNull(fileName).endsWith("."+type)) {
+                fileExtension = type;
+                break;
+            };
+        }
+        
+        if (fileExtension == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Unsupported file format: " + fileExtension
+            );
+        }
+
+        FileInfo fileInfo = FileInfo.builder()
+                .name(fileName)
+                .size(file.getSize())
+                .fileType(fileExtension)
+                .article(article)
+                .build();
+
+        Path path = Paths.get(FILE_UPLOAD_DIR + fileName);
+
+        try {
+            Files.copy(file.getInputStream(), path);
+
+            if (!Files.exists(path)) {
+                throw new IOException("File was not saved successfully");
+            }
+        } catch (FileAlreadyExistsException e) {
+            String baseName = fileName.substring(0, fileName.length() - fileExtension.length()-1);
+
+            String fileNameOnDisk = baseName + "_" + ZonedDateTime.now().toEpochSecond() + "." + fileExtension;
+            path = Paths.get(FILE_UPLOAD_DIR + fileNameOnDisk);
+            Files.copy(file.getInputStream(), path);
+
+            if (!Files.exists(path)) {
+                throw new IOException("File was not saved successfully");
+            }
+
+            fileInfo.setName(fileNameOnDisk);
+        }
+
+        return fileRepository.save(fileInfo);
+
+    }
+
 }

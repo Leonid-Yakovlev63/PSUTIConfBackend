@@ -37,4 +37,7 @@ public class CreateConferenceDTO {
     LocalDate startDate;
 
     LocalDate endDate;
+
+    String supportedFileFormats;
+
 }
