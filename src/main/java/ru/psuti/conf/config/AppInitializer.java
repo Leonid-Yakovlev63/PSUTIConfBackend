@@ -73,6 +73,16 @@ public class AppInitializer {
 
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
+                Path privatePath = Paths.get(uploadDir + "/private");
+
+                if (!Files.exists(privatePath)) {
+                    Files.createDirectories(privatePath);
+                }
+                Path publicPath = Paths.get(uploadDir + "/public");
+
+                if (!Files.exists(publicPath)) {
+                    Files.createDirectories(publicPath);
+                }
             }
         } catch (Exception e) {
             log.error("Не удалось создать каталог с файлами", e);
