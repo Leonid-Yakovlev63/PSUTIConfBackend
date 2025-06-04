@@ -32,6 +32,7 @@ public class ConferenceSection {
     @Column(name = "place_en")
     private String placeEn;
 
-    @Column(name = "is_default", columnDefinition = "boolean default true")
-    private Boolean isDefault;
+    @Builder.Default
+    @Column(name = "is_default", columnDefinition = "bool default true")
+    private Boolean isDefault = true;
 }
