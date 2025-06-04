@@ -216,10 +216,19 @@ public class ConferenceService {
                 .build());
 
         pages.add(ConferencePage.builder()
+                .path("application")
+                .pageNameRu("Заявка на участие")
+                .pageNameEn("Application for participation")
+                .pageIndex(4)
+                .isEnabled(false)
+                .conference(conference)
+                .build());
+
+        pages.add(ConferencePage.builder()
                 .path("proceedings")
                 .pageNameRu("Заседание")
                 .pageNameEn("Proceedings")
-                .pageIndex(4)
+                .pageIndex(5)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
@@ -228,7 +237,7 @@ public class ConferenceService {
                 .path("report")
                 .pageNameRu("Труды")
                 .pageNameEn("Report")
-                .pageIndex(5)
+                .pageIndex(6)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
@@ -237,7 +246,7 @@ public class ConferenceService {
                 .path("contacts")
                 .pageNameRu("Контакты")
                 .pageNameEn("Contacts")
-                .pageIndex(6)
+                .pageIndex(7)
                 .isEnabled(false)
                 .conference(conference)
                 .build());
