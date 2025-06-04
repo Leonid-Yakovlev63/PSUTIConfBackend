@@ -16,15 +16,22 @@ public class ConferenceSection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "section_name")
-    private String sectionName;
+    @Column(name = "section_name_ru", nullable = false)
+    private String sectionNameRu;
 
-    private String description;
+    @Column(name = "section_name_en")
+    private String sectionNameEn;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conference")
     private Conference conference;
 
-    private String place;
+    @Column(name = "place_ru")
+    private String placeRu;
 
+    @Column(name = "place_en")
+    private String placeEn;
+
+    @Column(name = "is_default", columnDefinition = "boolean default true")
+    private Boolean isDefault;
 }

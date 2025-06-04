@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.psuti.conf.dto.request.AddAdminForConferenceDTO;
 import ru.psuti.conf.dto.request.ConferenceInfoDTO;
+import ru.psuti.conf.dto.request.ConferenceSectionDTO;
 import ru.psuti.conf.dto.request.ConferenceSettingsDTO;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
 import ru.psuti.conf.dto.response.*;
@@ -19,6 +20,7 @@ import ru.psuti.conf.entity.auth.ConferenceUserPermissions;
 import ru.psuti.conf.entity.auth.PermissionFlags;
 import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.entity.auth.User;
+import ru.psuti.conf.service.ConferenceSectionService;
 import ru.psuti.conf.service.ConferenceService;
 import ru.psuti.conf.service.ConferenceUserPermissionsService;
 import ru.psuti.conf.service.UserService;
@@ -31,6 +33,9 @@ public class ConferenceController {
 
     @Autowired
     private ConferenceService conferenceService;
+
+    @Autowired
+    private ConferenceSectionService conferenceSectionService;
 
     @Autowired
     private ConferenceUserPermissionsService conferenceUserPermissionsService;
@@ -200,6 +205,15 @@ public class ConferenceController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Conference not found");
         }
+    }
+
+    @PatchMapping("/slug/{slug}/sections")
+    public ResponseEntity<String> updateConferenceSections(
+            @PathVariable String slug,
+            @RequestBody List<ConferenceSectionDTO> conferenceSectionDTOs
+    ) {
+        conferenceSectionService.updateConferenceSections(slug, conferenceSectionDTOs);
+        return ResponseEntity.ok("Conference sections updated successfully");
     }
 
     @PutMapping("/slug/{slug}/info")

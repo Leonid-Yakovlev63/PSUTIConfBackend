@@ -16,6 +16,7 @@ public class FullConferenceDTO {
     Long id;
     String slug;
     Boolean isEnabled;
+    Boolean isEnabledForRegistration;
     Boolean isEnglishEnabled;
     String conferenceNameRu;
     String conferenceNameEn;
@@ -28,6 +29,7 @@ public class FullConferenceDTO {
     String webSite;
     String email;
     String phone;
+    String supportedFileFormats;
     ZonedDateTime closingDateForApplications;
     ZonedDateTime closingDateForRegistrations;
     List<ConferenceSectionDTO> conferenceSections;
@@ -38,6 +40,7 @@ public class FullConferenceDTO {
         this.id = conference.getId();
         this.slug = conference.getSlug();
         this.isEnabled = conference.getIsEnabled();
+        this.isEnabledForRegistration = conference.getIsEnabledForRegistration();
         this.isEnglishEnabled = conference.getIsEnglishEnabled();
         this.conferenceNameRu = conference.getConferenceNameRu();
         this.conferenceNameEn = conference.getConferenceNameEn();
@@ -50,6 +53,7 @@ public class FullConferenceDTO {
         this.webSite = conference.getWebSite();
         this.email = conference.getEmail();
         this.phone = conference.getPhone();
+        this.supportedFileFormats = conference.getSupportedFileFormats();
         this.closingDateForApplications = conference.getClosingDateForApplications();
         this.closingDateForRegistrations = conference.getClosingDateForRegistrations();
 

@@ -177,8 +177,8 @@ public class ConferenceService {
         List<ConferenceSection> sections = new ArrayList<>();
 
         sections.add(ConferenceSection.builder()
-                .sectionName("Без секции")
-                .description("Стандартная секция")
+                .sectionNameRu("Без секции")
+                .sectionNameEn("Without section")
                 .conference(conference)
                 .build());
 

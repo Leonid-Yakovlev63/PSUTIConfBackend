@@ -9,14 +9,18 @@ import ru.psuti.conf.entity.ConferenceSection;
 public class ConferenceSectionDTO {
 
     Long id;
-    String sectionName;
-    String description;
-    String place;
+    String sectionNameRu;
+    String sectionNameEn;
+    String placeRu;
+    String placeEn;
+    Boolean isDefault;
 
     public ConferenceSectionDTO(ConferenceSection section) {
         this.id = section.getId();
-        this.sectionName = section.getSectionName();
-        this.description = section.getDescription();
-        this.place = section.getPlace();
+        this.sectionNameRu = section.getSectionNameRu();
+        this.sectionNameEn = section.getSectionNameEn();
+        this.placeRu = section.getPlaceRu();
+        this.placeEn = section.getPlaceEn();
+        this.isDefault = section.getIsDefault();
     }
 }

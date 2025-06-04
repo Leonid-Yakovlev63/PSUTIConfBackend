@@ -11,4 +11,6 @@ public class ConferenceSettingsDTO {
 
     Boolean isEnglishEnabled;
 
+    String supportedFileFormats;
+
 }

@@ -60,6 +60,7 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
             "is_enabled = :#{#dto.isEnabled}, " +
             "is_enabled_for_registration = :#{#dto.isEnabledForRegistration}, " +
             "is_english_enabled = :#{#dto.isEnglishEnabled}, " +
+            "supported_file_formats = :#{#dto.supportedFileFormats}, " +
             "updated_at = CURRENT_TIMESTAMP " +
             "WHERE slug = :slug",
             nativeQuery = true)
