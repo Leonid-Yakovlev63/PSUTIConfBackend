@@ -1,21 +1,18 @@
-package ru.psuti.conf.dto.response.auth;
+package ru.psuti.conf.dto.response.users;
 
 import lombok.Value;
+import ru.psuti.conf.dto.response.auth.CompactNamesDTO;
 import ru.psuti.conf.entity.Locale;
 import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.entity.auth.UserLocalized;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * DTO for {@link User}
- */
 @Value
-public class CompactUserDTO {
+public class UserDTO {
     UUID id;
 
     String email;
@@ -28,9 +25,7 @@ public class CompactUserDTO {
 
     Map<Locale, CompactNamesDTO> names;
 
-    List<ConferencePermissionsDTO> conferences;
-
-    public CompactUserDTO(User user) {
+    public UserDTO(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.role = user.getRole();
@@ -41,11 +36,5 @@ public class CompactUserDTO {
                         UserLocalized::getLocale,
                         CompactNamesDTO::new
                 ));
-        if (!role.equals(Role.ADMIN)) {
-            this.conferences = user.getConferenceUserPermissions().stream()
-                    .map(ConferencePermissionsDTO::new).toList();
-        } else {
-            this.conferences = null;
-        }
     }
 }
