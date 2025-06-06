@@ -94,7 +94,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request
                             .requestMatchers(AUTH_WHITELIST).permitAll()
-                            .requestMatchers("/users/me").authenticated()
+                            .requestMatchers("/users/me", "/users/me/**").authenticated()
                             .requestMatchers("/articles/**").authenticated()
                             .requestMatchers("/users/**").hasRole(Role.ADMIN.name())
                             .requestMatchers("/conferences", "/conferences/new").hasRole(Role.ADMIN.name())
