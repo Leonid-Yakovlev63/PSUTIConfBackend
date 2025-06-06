@@ -2,15 +2,18 @@ package ru.psuti.conf.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.psuti.conf.dto.response.auth.CompactUserDTO;
 import ru.psuti.conf.dto.response.users.FullUserDTO;
 import ru.psuti.conf.dto.response.users.UserConference;
+import ru.psuti.conf.dto.response.users.UserDTO;
 import ru.psuti.conf.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -39,8 +42,13 @@ public class UserController {
     }
 
     @GetMapping
-    public List<CompactUserDTO> getUsers() {
-        return null;
+    public List<UserDTO> getUsers() {
+        return userService.getAllUsers().stream().map(UserDTO::new).toList();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<FullUserDTO> getUserById(@PathVariable UUID id) {
+        return userService.getUserById(id).map(u -> new FullUserDTO(u, true));
     }
 
 }
