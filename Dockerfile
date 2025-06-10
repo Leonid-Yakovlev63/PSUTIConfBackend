@@ -6,7 +6,7 @@ COPY . /home/gradle/project
 
 RUN chmod +x /home/gradle/project/gradlew && /home/gradle/project/gradlew build -x test --no-daemon
 
-FROM openjdk:21-jdk-slim
+FROM openjdk:21-jdk-slim as runner
 
 WORKDIR /app
 
