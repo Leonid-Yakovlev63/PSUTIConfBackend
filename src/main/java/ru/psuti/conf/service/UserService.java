@@ -13,7 +13,9 @@ import ru.psuti.conf.entity.auth.User;
 import ru.psuti.conf.repository.EmailChangeCodeRepository;
 import ru.psuti.conf.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -63,11 +65,20 @@ public class UserService {
         return this::getByUsername;
     }
 
-    public void deleteUserById(Long id) {
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public Optional<User> getUserById(UUID id) {
+        if (id == null) return Optional.empty();
+        return userRepository.findById(id);
+    }
+
+    public void deleteUserById(UUID id) {
         userRepository.deleteById(id);
     }
 
-    public boolean existsUserById(Long id) {
+    public boolean existsUserById(UUID id) {
         return userRepository.existsById(id);
     }
 

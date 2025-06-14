@@ -8,9 +8,10 @@ import ru.psuti.conf.entity.auth.User;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.conferenceUserPermissions WHERE u.email = :email")
     Optional<User> findByEmailEager(@Param("email") String email);

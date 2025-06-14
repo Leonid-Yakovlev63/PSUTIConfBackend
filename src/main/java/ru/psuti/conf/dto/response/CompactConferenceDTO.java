@@ -1,7 +1,7 @@
 package ru.psuti.conf.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Data;
 import ru.psuti.conf.entity.Conference;
 
 import java.time.LocalDate;
@@ -9,13 +9,13 @@ import java.time.LocalDate;
 /**
  * DTO for {@link ru.psuti.conf.entity.Conference}
  */
-@Value
+@Data
 @AllArgsConstructor
 public class CompactConferenceDTO {
     Long id;
     String slug;
     Boolean isEnabled;
-    Boolean isEnglishEnable;
+    Boolean isEnglishEnabled;
     String conferenceNameRu;
     String conferenceNameEn;
     String statusRu;
@@ -27,7 +27,7 @@ public class CompactConferenceDTO {
         this.id = conference.getId();
         this.slug = conference.getSlug();
         this.isEnabled = conference.getIsEnabled();
-        this.isEnglishEnable = conference.getIsEnglishEnabled();
+        this.isEnglishEnabled = conference.getIsEnglishEnabled();
         this.conferenceNameRu = conference.getConferenceNameRu();
         this.conferenceNameEn = conference.getConferenceNameEn();
         this.statusRu = conference.getStatusRu();
