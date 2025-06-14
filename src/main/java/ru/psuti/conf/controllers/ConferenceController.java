@@ -332,6 +332,24 @@ public class ConferenceController {
         return conferenceService.getNewConferences();
     }
 
+    @GetMapping("/{slug}/applications")
+    public ResponseEntity<?> getApplicationsByConferenceSlug(@PathVariable String slug) {
+
+        Optional<Conference> optionalConference = conferenceService.getConferenceBySlug(slug);
+
+        if (optionalConference.isPresent()) {
+            Conference conference = optionalConference.get();
+            if (hasPermission(conference)) {
+                List<CompactArticleDTO> compactArticleDTOs = conferenceService.getApplicationsByConference(conference);
+                return new ResponseEntity<>(compactArticleDTOs, HttpStatus.OK);
+            }
+            return new ResponseEntity<>("Access denied",HttpStatus.FORBIDDEN);
+        } else {
+            return new ResponseEntity<>("Conference with slug %s not found".formatted(slug),HttpStatus.NOT_FOUND);
+        }
+
+    }
+
     private boolean hasPagePermission(String slug) {
         Optional<User> optionalUser = UserService.getCurrentUser();
         if(optionalUser.isPresent()){

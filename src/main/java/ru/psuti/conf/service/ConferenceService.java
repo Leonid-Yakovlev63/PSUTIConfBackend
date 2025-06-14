@@ -6,12 +6,15 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.psuti.conf.dto.request.ConferenceInfoDTO;
 import ru.psuti.conf.dto.request.ConferenceSettingsDTO;
 import ru.psuti.conf.dto.request.CreateConferenceDTO;
+import ru.psuti.conf.dto.response.CompactArticleDTO;
 import ru.psuti.conf.dto.response.CompactConferenceDTO;
 import ru.psuti.conf.dto.response.CompactConferencePageDTO;
 import ru.psuti.conf.dto.response.ConferencePageDTO;
+import ru.psuti.conf.entity.Article;
 import ru.psuti.conf.entity.Conference;
 import ru.psuti.conf.entity.ConferencePage;
 import ru.psuti.conf.entity.ConferenceSection;
+import ru.psuti.conf.repository.ArticleRepository;
 import ru.psuti.conf.repository.ConferencePageRepository;
 import ru.psuti.conf.repository.ConferenceRepository;
 import ru.psuti.conf.repository.ConferenceSectionRepository;
@@ -31,6 +34,9 @@ public class ConferenceService {
 
     @Autowired
     private ConferenceSectionRepository conferenceSectionRepository;
+
+    @Autowired
+    private ArticleRepository articleRepository;
 
     public List<CompactConferenceDTO> getConferences() {
         return conferenceRepository.findAll().stream().map(CompactConferenceDTO::new).collect(Collectors.toList());
@@ -306,4 +312,13 @@ public class ConferenceService {
             conferencePageRepository.delete(page);
         }
     }
+
+    public List<CompactArticleDTO> getApplicationsByConference(Conference conference) {
+        List<Article> articles = articleRepository.findBySection_Conference(conference);
+
+        return articles.stream()
+                .map(CompactArticleDTO::from)
+                .toList();
+    }
+
 }
