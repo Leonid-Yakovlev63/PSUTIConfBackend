@@ -8,8 +8,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.psuti.conf.dto.response.CompactArticleDTO;
+import ru.psuti.conf.entity.Article;
 import ru.psuti.conf.entity.auth.Role;
 import ru.psuti.conf.entity.auth.User;
+import ru.psuti.conf.repository.ArticleRepository;
 import ru.psuti.conf.repository.EmailChangeCodeRepository;
 import ru.psuti.conf.repository.UserRepository;
 
@@ -20,7 +23,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
+
+    private final ArticleRepository articleRepository;
 
     private final EmailChangeCodeRepository emailChangeCodeRepository;
 
@@ -80,6 +86,11 @@ public class UserService {
 
     public boolean existsUserById(UUID id) {
         return userRepository.existsById(id);
+    }
+
+    public List<CompactArticleDTO> getUserArticles(UUID userId) {
+        List<Article> articles = articleRepository.findByUserId(userId);
+        return articles.stream().map(CompactArticleDTO::from).toList();
     }
 
 }

@@ -14,4 +14,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     List<Article> findBySection_Conference(Conference conference);
 
     List<Article> findBySection_ConferenceAndUserId(Conference conference, UUID userId);
+
+    List<Article> findByUserId(UUID userId);
+
 }
