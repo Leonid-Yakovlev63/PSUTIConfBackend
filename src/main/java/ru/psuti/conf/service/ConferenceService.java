@@ -321,4 +321,10 @@ public class ConferenceService {
                 .toList();
     }
 
+    public List<CompactArticleDTO> getUserApplicationsByConference(Conference conference, UUID userId) {
+        List<Article> articles = articleRepository.findBySection_ConferenceAndUserId(conference, userId);
+        return articles.stream().map(CompactArticleDTO::from).toList();
+    }
+
+
 }

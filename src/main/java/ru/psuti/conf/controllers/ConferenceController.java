@@ -345,8 +345,29 @@ public class ConferenceController {
             }
             return new ResponseEntity<>("Access denied",HttpStatus.FORBIDDEN);
         } else {
-            return new ResponseEntity<>("Conference with slug %s not found".formatted(slug),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Conference with slug '%s' not found".formatted(slug),HttpStatus.NOT_FOUND);
         }
+
+    }
+
+    @GetMapping("/{slug}/applications/self")
+    public ResponseEntity<?> getUserApplicationsByConferenceSlug(@PathVariable String slug) {
+        Optional<Conference> optionalConference = conferenceService.getConferenceBySlug(slug);
+
+        if (optionalConference.isEmpty()) {
+            return new ResponseEntity<>("Conference with slug '%s' not found".formatted(slug), HttpStatus.NOT_FOUND);
+        }
+
+        Conference conference = optionalConference.get();
+
+        Optional<User> optionalUser = UserService.getCurrentUser();
+        if(optionalUser.isPresent()){
+            UUID currentUserId = optionalUser.get().getId();
+            List<CompactArticleDTO> dtos = conferenceService.getUserApplicationsByConference(conference, currentUserId);
+            return ResponseEntity.ok(dtos);
+        }
+
+        return new ResponseEntity<>("User not authenticated",HttpStatus.UNAUTHORIZED);
 
     }
 
